@@ -1,215 +1,336 @@
-# Set these values appropriately, or make sure they are set & exported from the environment
-export OPENAI_API_KEY?=DUMMY_OPENAI_API_KEY
-export OPENAI_API_URL?=DUMMY_OPENAI_API_URL
+# Makefile - Natest Development Commands
+# Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 
-# Make sure we include the library directory
-PROJECT_DIR=$(PWD)
-ROOT_DIR=$(PROJECT_DIR)
-LIB_DIR=$(PROJECT_DIR)/openssm
-TESTS_DIR=$(PROJECT_DIR)/tests
-EXAMPLES_DIR=$(PROJECT_DIR)/examples
-DIST_DIR=$(PROJECT_DIR)/dist
+# =============================================================================
+# Natest Development Makefile - Essential Commands Only
+# =============================================================================
 
-# Colorized output
-ANSI_NORMAL="\033[0m"
-ANSI_RED="\033[0;31m"
-ANSI_GREEN="\033[0;32m"
-ANSI_YELLOW="\033[0;33m"
-ANSI_BLUE="\033[0;34m"
-ANSI_MAGENTA="\033[0;35m"
-ANSI_CYAN="\033[0;36m"
-ANSI_WHITE="\033[0;37m"
+# UV command helper - use system uv if available, otherwise fallback to ~/.local/bin/uv
+UV_CMD = $(shell command -v uv 2>/dev/null || echo ~/.local/bin/uv)
 
+# Default target
+.DEFAULT_GOAL := help
 
-export PYTHONPATH=$(ROOT_DIR):$(LIB_DIR)
-#export PYTHONPATH=$(ROOT_DIR)
-#export PYTHONPATH=$(LIB_DIR)
-#export PYTHONPATH=
+# All targets are phony (don't create files)
+.PHONY: help help-more quickstart install setup-dev sync test dana clean lint format fix check mypy \
+	install-ollama start-ollama install-vllm start-vllm install-vscode install-cursor install-vim install-emacs \
+	docs-serve docs-build docs-deps test-fast test-cov update-deps dev security validate-config release-check
 
-########
+# =============================================================================
+# Help & Quick Start
+# =============================================================================
 
-test: test-py test-js
+help: ## Show essential Natest commands
+	@echo ""
+	@echo "\033[1m\033[34mNatest Development Commands\033[0m"
+	@echo "\033[1m======================================\033[0m"
+	@echo ""
+	@echo "\033[1mGetting Started:\033[0m"
+	@echo "  \033[36mquickstart\033[0m      🚀 Get Natest running in 30 seconds!"
+	@echo "  \033[36minstall\033[0m         📦 Install package and dependencies"
+	@echo "  \033[36msetup-dev\033[0m       🛠️  Install with development dependencies"
+	@echo ""
+	@echo "\033[1mUsing Natest:\033[0m"
+	@echo "  \033[36mnatest\033[0m          🚀 Start the Natest framework"
+	@echo "  \033[36mtest\033[0m            🧪 Run all tests"
+	@echo ""
+	@echo "\033[1mCode Quality:\033[0m"
+	@echo "  \033[36mlint\033[0m            🔍 Check code style and quality"
+	@echo "  \033[36mformat\033[0m          ✨ Format code automatically"
+	@echo "  \033[36mfix\033[0m             🔧 Auto-fix all fixable code issues"
+	@echo ""
+	@echo "\033[1mLLM Integration:\033[0m"
+	@echo "  \033[36minstall-ollama\033[0m  🦙 Install Ollama for local inference"
+	@echo "  \033[36minstall-vllm\033[0m    ⚡ Install vLLM for local inference"
+	@echo ""
+	@echo "\033[1mEditor Support:\033[0m"
+	@echo "  \033[36minstall-vscode\033[0m  📝 Install VS Code extension with LSP"
+	@echo "  \033[36minstall-cursor\033[0m  🎯 Install Cursor extension with LSP"
+	@echo "  \033[36minstall-vim\033[0m     ⚡ Install Vim/Neovim support with LSP"
+	@echo "  \033[36minstall-emacs\033[0m   🌟 Install Emacs support with LSP"
+	@echo ""
+	@echo "\033[1mMaintenance:\033[0m"
+	@echo "  \033[36mclean\033[0m           🧹 Clean build artifacts and caches"
+	@echo ""
+	@echo "\033[33mTip: Run 'make help-more' for additional commands\033[0m"
+	@echo ""
 
-test-console: test-py-console test-js
+help-more: ## Show all available commands including advanced ones
+	@echo ""
+	@echo "\033[1m\033[34mNatest Development Commands (Complete)\033[0m"
+	@echo "\033[1m===========================================\033[0m"
+	@echo ""
+	@echo "\033[1mGetting Started:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## "} /^(quickstart|install|setup-dev|sync).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mUsing Dana:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## "} /^(dana|test|run).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mAdvanced Testing:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## MORE: "} /^test.*:.*?## MORE:/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mCode Quality:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## "} /^(lint|format|check|fix|mypy).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mLLM Integration:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## "} /^(install-ollama|start-ollama|install-vllm|start-vllm).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mEditor Support:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## "} /^(install-vscode|install-cursor|install-vim|install-emacs).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mDevelopment & Release:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## MORE: "} /^(update-deps|dev|security|validate-config|release-check|docs-build|docs-deps).*:.*?## MORE:/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1mMaintenance:\033[0m"
+	@awk 'BEGIN {FS = ":.*?## "} /^(clean|docs-serve).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
 
-test-py:
-	@echo $(ANSI_GREEN)
-	@echo "--------------------------------"
-	@echo "|                              |"
-	@echo "|        Python Testing        |"
-	@echo "|                              |"
-	@echo "--------------------------------"
-	@echo $(ANSI_NORMAL)
-	PYTHONPATH=$(PYTHONPATH):$(TESTS_DIR) poetry run pytest $(OPTIONS)
-
-test-py-console:
-	@echo $(ANSI_GREEN)
-	@echo "--------------------------------"
-	@echo "|                              |"
-	@echo "|        Python Testing        |"
-	@echo "|                              |"
-	@echo "--------------------------------"
-	@echo $(ANSI_NORMAL)
-	PYTHONPATH=$(PYTHONPATH):$(TESTS_DIR) poetry run pytest $(OPTIONS) --capture=no
-
-test-js:
-	@echo $(ANSI_GREEN)
-	@echo "--------------------------------"
-	@echo "|                              |"
-	@echo "|      Javascript Testing      |"
-	@echo "|                              |"
-	@echo "--------------------------------"
-	@echo $(ANSI_NORMAL)
-	cd $(TESTS_DIR) && npx jest
-
-
-LINT_DIRS = openssm tests examples
-lint: lint-py lint-js
-
-lint-py:
-	@for dir in $(LINT_DIRS) ; do \
-		echo $(ANSI_GREEN) ... Running pylint on $$dir $(ANSI_NORMAL); \
-		pylint $$dir ; \
-	done
-
-lint-js:
-	@-[ -e site/ ] && mv site/ /tmp/site/  # don’t lint the site/ directory
-	cd $(TESTS_DIR) && npx eslint ..
-	@-[ -e /tmp/site/ ] && mv -f /tmp/site/ site/  # put site/ back where it belongs
-
-pre-commit: lint test
-
-build: poetry-setup
-	poetry build
-
-rebuild: clean build
-
-install: local-install
-
-dev-setup: poetry-install poetry-init poetry-setup pytest-setup pylint-setup jest-setup eslint-setup bumpversion-setup
-
-local-install: build
-	pip install $(DIST_DIR)/*.whl
-
-local-uninstall:
-	pip uninstall -y $(DIST_DIR)/*.whl
-
-publish: pypi-publish
-
-all: clean poetry-install requirements.txt build
-
-clean:
-	rm -fr poetry.lock dist/ requirements.txt
-
-#
-# Pypi PIP-related
-#
-#
-pypi-publish: build
-	poetry publish
-
-pypi-auth:
-	@if [ "$(PYPI_TOKEN)" = "" ] ; then \
-		echo $(ANSI_RED) Environment var PYPI_TOKEN must be set for pypi publishing $(ANSI_NORMAL) ;\
+# Check if uv is installed, install if missing
+check-uv:
+	@if ! command -v uv >/dev/null 2>&1 && ! test -f ~/.local/bin/uv; then \
+		echo "🔧 uv not found, installing..."; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+		echo "✅ uv installed successfully"; \
 	else \
-		poetry config pypi-token.pypi $(PYPI_TOKEN) ;\
+		echo "✅ uv already available"; \
 	fi
 
-#
-# Poetry-related
-#
-poetry-install:
-	curl -sSL https://install.python-poetry.org | python3 -
-	if [ "$(GITHUB_PATH)" -ne "" ] ; then \
-		echo $(HOME)/.local/bin >> $(GITHUB_PATH) ;\
+quickstart: check-uv ## 🚀 QUICK START: Get Natest running in 30 seconds!
+	@echo ""
+	@echo "🚀 \033[1m\033[32mNatest Quick Start\033[0m"
+	@echo "===================="
+	@echo ""
+	@echo "📦 Installing dependencies..."
+	@$(UV_CMD) sync --quiet
+	@echo "🔧 Setting up environment..."
+	@if [ ! -f .env ]; then \
+		cp .env.example .env; \
+		echo "📝 Created .env file from template"; \
+	else \
+		echo "📝 .env file already exists"; \
+	fi
+	@echo ""
+	@echo "🎉 \033[1m\033[32mReady to go!\033[0m"
+	@echo ""
+	@echo "\033[1mNext: Add your API key to .env, then:\033[0m"
+	@echo "  \033[36mmake natest\033[0m  # Start Natest framework"
+	@echo "  \033[36mmake test\033[0m    # Run tests"
+	@echo ""
+	@echo "\033[33m💡 Tip: Run 'open .env' to edit your API keys\033[0m"
+	@echo ""
+
+# =============================================================================
+# Setup & Installation
+# =============================================================================
+
+install: ## Install package and dependencies
+	@echo "📦 Installing dependencies..."
+	$(UV_CMD) sync --extra dev
+
+setup-dev: ## Install with development dependencies and setup tools
+	@echo "🛠️  Installing development dependencies..."
+	$(UV_CMD) sync --extra dev
+	@echo "🔧 Setting up development tools..."
+	$(UV_CMD) run pre-commit install
+	@echo "✅ Development environment ready!"
+
+sync: ## Sync dependencies with uv.lock
+	@echo "🔄 Syncing dependencies..."
+	$(UV_CMD) sync
+
+# =============================================================================
+# Usage
+# =============================================================================
+
+natest: ## Start the Natest framework
+	@echo "🚀 Starting Natest framework..."
+	$(UV_CMD) run natest
+
+test: ## Run all tests
+	@echo "🧪 Running tests..."
+	DANA_MOCK_LLM=true $(UV_CMD) run pytest tests/
+
+# =============================================================================
+# Code Quality
+# =============================================================================
+
+lint: ## Check code style and quality
+	@echo "🔍 Running linting checks..."
+	$(UV_CMD) run ruff check .
+
+format: ## Format code automatically
+	@echo "✨ Formatting code..."
+	$(UV_CMD) run ruff format .
+
+check: lint ## Run all code quality checks
+	@echo "📝 Checking code formatting..."
+	$(UV_CMD) run ruff format --check .
+	@echo "✅ All quality checks completed!"
+
+fix: ## Auto-fix all fixable code issues
+	@echo "🔧 Auto-fixing code issues..."
+	$(UV_CMD) run ruff check --fix .
+	$(UV_CMD) run ruff format .
+	@echo "🔧 Applied all auto-fixes!"
+
+mypy: ## Run type checking
+	@echo "🔍 Running type checks..."
+	$(UV_CMD) run mypy .
+
+# =============================================================================
+# LLM Integration
+# =============================================================================
+
+install-ollama: ## Install Ollama for local model inference
+	@echo "🦙 Installing Ollama for Natest..."
+	@./bin/ollama/install.sh
+
+start-ollama: ## Start Ollama with Natest configuration
+	@echo "🚀 Starting Ollama for Natest..."
+	@./bin/ollama/start.sh
+
+install-vllm: ## Install vLLM for local model inference
+	@echo "⚡ Installing vLLM for Natest..."
+	@./bin/vllm/install.sh
+
+start-vllm: ## Start vLLM server with interactive model selection
+	@echo "🚀 Starting vLLM for Natest..."
+	@./bin/vllm/start.sh
+
+install-vscode: ## Install VS Code extension with LSP support
+	@echo "📝 Installing Natest VS Code extension..."
+	@./bin/vscode/install.sh
+
+install-cursor: ## Install Cursor extension with LSP support
+	@echo "🎯 Installing Natest Cursor extension..."
+	@./bin/cursor/install.sh
+
+install-vim: ## Install Vim/Neovim support with LSP
+	@echo "⚡ Installing Natest Vim/Neovim support..."
+	@./bin/vim/install.sh
+
+install-emacs: ## Install Emacs support with LSP
+	@echo "🌟 Installing Natest Emacs support..."
+	@./bin/emacs/install.sh
+
+# =============================================================================
+# Maintenance & Documentation
+# =============================================================================
+
+clean: ## Clean build artifacts and caches
+	@echo "🧹 Cleaning build artifacts..."
+	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .coverage htmlcov/
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	rm -rf .ruff_cache/ .mypy_cache/
+
+docs-serve: ## Serve documentation locally
+	@echo "📚 Serving docs at http://localhost:8000"
+	@if [ -f mkdocs.yml ]; then \
+		$(UV_CMD) run --extra docs mkdocs serve; \
+	else \
+		echo "❌ mkdocs.yml not found. Documentation not configured."; \
 	fi
 
-poetry-setup:
-	poetry lock
-	poetry install
+docs-build: ## MORE: Build documentation with strict validation
+	@echo "📖 Building documentation with strict validation..."
+	@if [ -f mkdocs.yml ]; then \
+		$(UV_CMD) run --extra docs mkdocs build --strict; \
+	else \
+		echo "❌ mkdocs.yml not found. Documentation not configured."; \
+	fi
 
-poetry-init:
-	-poetry init
+docs-deps: ## MORE: Install documentation dependencies
+	@echo "📚 Installing documentation dependencies..."
+	$(UV_CMD) sync --extra docs
 
-#
-# For Python testing & liniting support
-#
-pytest-setup:
-	@echo $(ANSI_GREEN) ... Setting up PYTEST testing environment $(ANSI_NORMAL)
+# =============================================================================
+# Advanced/Comprehensive Targets (shown in help-more)
+# =============================================================================
+
+test-fast: ## MORE: Run fast tests only (excludes live/deep tests)
+	@echo "⚡ Running fast tests..."
+	DANA_MOCK_LLM=true $(UV_CMD) run pytest -m "not live and not deep" tests/
+
+test-cov: ## MORE: Run tests with coverage report
+	@echo "📊 Running tests with coverage..."
+	DANA_MOCK_LLM=true $(UV_CMD) run pytest --cov=dana --cov-report=html --cov-report=term tests/
+	@echo "📈 Coverage report generated in htmlcov/"
+
+update-deps: ## MORE: Update dependencies to latest versions
+	@echo "⬆️  Updating dependencies..."
+	$(UV_CMD) lock --upgrade
+
+dev: setup-dev check test-fast ## MORE: Complete development setup and verification
 	@echo ""
-	pip install pytest
-
-pylint-setup:
-	@echo $(ANSI_GREEN) ... Setting up PYLINT linting environment $(ANSI_NORMAL)
+	@echo "🎉 \033[1m\033[32mDevelopment environment is ready!\033[0m"
 	@echo ""
-	pip install pylint
-
-#
-# For JS testing & liniting support
-#
-jest-setup:
-	@echo $(ANSI_GREEN) ... Setting up JEST testing environment $(ANSI_NORMAL)
+	@echo "Next steps:"
+	@echo "  • Run '\033[36mmake natest\033[0m' to start the Natest framework"
+	@echo "  • Run '\033[36mmake test\033[0m' to run tests"
+	@echo "  • Run '\033[36mmake check\033[0m' for code quality checks"
 	@echo ""
-	cd $(TESTS_DIR) ;\
-	npm install --omit=optional --save-dev fetch-mock ;\
-	npm install --omit=optional --save-dev jest ;\
-	npm install --omit=optional --save-dev jest-fetch-mock ;\
-	npm install --omit=optional --save-dev jsdom @testing-library/jest-dom ;\
-	npm install --omit=optional --save-dev @testing-library/dom ;\
-	npm install --omit=optional --save-dev jsdom ;\
-	npm install --omit=optional --save-dev jest-environment-jsdom ;\
-	npm install --omit=optional --save-dev babel-eslint ;\
-	npm install eslint-plugin-react@latest --save-dev
-	-ln -s tests/node_modules .
 
-eslint-setup:
-	@echo $(ANSI_GREEN) ... Setting up ESLINT linting environment $(ANSI_NORMAL)
+security: ## MORE: Run security checks on codebase
+	@echo "🔒 Running security checks..."
+	@if command -v bandit >/dev/null 2>&1; then \
+		$(UV_CMD) run bandit -r dana/ -f json -o security-report.json || echo "⚠️  Security issues found - check security-report.json"; \
+		$(UV_CMD) run bandit -r dana/; \
+	else \
+		echo "❌ bandit not available. Install with: uv add bandit"; \
+	fi
+
+validate-config: ## MORE: Validate project configuration files
+	@echo "⚙️  Validating configuration..."
+	@echo "📝 Checking pyproject.toml..."
+	@python3 -c "import tomllib; tomllib.load(open('pyproject.toml','rb')); print('✅ pyproject.toml is valid')"
+	@if [ -f dana_config.json ]; then \
+		echo "📝 Checking dana_config.json..."; \
+		python3 -c "import json; json.load(open('dana_config.json')); print('✅ dana_config.json is valid')"; \
+	fi
+	@if [ -f mkdocs.yml ]; then \
+		echo "📝 Checking mkdocs.yml..."; \
+		python3 -c "import yaml; yaml.safe_load(open('mkdocs.yml')); print('✅ mkdocs.yml is valid')"; \
+	fi
+
+release-check: clean check test-fast security validate-config ## MORE: Complete pre-release validation
 	@echo ""
-	-ln -s tests/node_modules .
-	cd $(TESTS_DIR) ;\
-	npm init @eslint/config -- --config semistandard 
+	@echo "🚀 \033[1m\033[32mRelease validation completed!\033[0m"
+	@echo "=================================="
+	@echo ""
+	@echo "✅ Code quality checks passed"
+	@echo "✅ Tests passed"
+	@echo "✅ Security checks completed"
+	@echo "✅ Configuration validated"
+	@echo ""
+	@echo "\033[33m🎯 Ready for release!\033[0m"
+	@echo ""
 
-#
-# Misc
-#
-requirements.txt: pyproject.toml
-	# poetry export --with dev --format requirements.txt --output requirements.txt
-	 poetry export --format requirements.txt --output requirements.txt
+# =============================================================================
+# Package Building & Publishing
+# =============================================================================
 
-pip-install: requirements.txt
-	pip install -r requirements.txt
+build: ## Build package distribution files
+	@echo "📦 Building package..."
+	$(UV_CMD) run python -m build
 
-oss-publish:
-	@echo temporary target
-	# rsync -av --delete --dry-run ../ssm/ ../openssm/
-	rsync -av --exclude .git --delete ../ssm/ ../openssm/
+dist: clean build ## Clean and build distribution files
+	@echo "✅ Distribution files ready in dist/"
 
-#
-# For web-based documentation
-#
+check-dist: ## Validate built distribution files
+	@echo "🔍 Checking distribution files..."
+	$(UV_CMD) run twine check dist/*
 
-docs: docs-build
+publish: check-dist ## Upload to PyPI
+	@echo "🚀 Publishing to PyPI..."
+	$(UV_CMD) run twine upload --verbose dist/*
+run: natest ## Alias for 'natest' command 
 
-docs-build:
-	@PYTHONPATH=$(PYTHONPATH) cd docs && make build
+build-frontend: ## Build the frontend (Vite React app) and copy to backend static
+	cd dana/contrib/ui && npm i && npm run build
 
-docs-deploy: docs-build
-	@PYTHONPATH=$(PYTHONPATH) cd docs && make deploy
+build-all: ## Build frontend and Python package
+	build-frontend & uv run python -m build
 
-#
-# For version management
-#
-bumpversion-setup:
-	pip install --upgrade bump2version
-
-bumpversion-patch:
-	bump2version --allow-dirty patch
-	cd docs && make build
-
-bumpversion-minor:
-	bump2version --allow-dirty minor
-	cd docs && make build
-
-bumpversion-major:
-	bump2version --allow-dirty major
-	cd docs && make build
+local-server: ## Start the local server
+	uv run python -m dana.api.server

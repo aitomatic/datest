@@ -1,0 +1,100 @@
+# .markdownlint.yaml - Markdown Linting Configuration
+# Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
+
+# MD004: Unordered list style (enforces consistent bullet style)
+MD004: false
+ul-style: false
+
+# MD005: Inconsistent indentation for list items at the same level (disallows inconsistent indentation for list items at the same level)
+MD005: false
+list-indent: false
+
+# MD007: Unordered list indentation (enforces consistent indentation for nested lists)
+MD007: false
+ul-indent: false
+
+# MD009: Trailing spaces (disallows lines ending with whitespace)
+MD009: false
+no-trailing-spaces: false
+
+# MD012: Multiple consecutive blank lines (disallows more than one blank line in a row)
+MD012: false
+no-multiple-blanks: false
+
+# MD013: Line length (enforces maximum line length)
+MD013: false
+line-length: false
+
+# MD022: Headings should be surrounded by blank lines
+MD022: false
+blanks-around-headings: false
+
+# MD024: Multiple headings with the same content (disallows duplicate headings)
+MD024: false
+no-duplicate-heading: false
+
+# MD025: Multiple top-level headings in the same document (enforces a single H1)
+MD025: true
+single-title: true
+
+# MD026: Trailing punctuation in heading (disallows punctuation at end of headings)
+MD026: false
+trailing-punctuation: false
+
+# MD028: Blank line inside blockquote (disallows blank lines within blockquotes)
+MD028: false
+no-blanks-blockquote: false
+
+# MD029: Ordered list item prefix (enforces consistent numbering style)
+MD029: false
+ol-prefix: false
+
+# MD030: Spaces after list markers (enforces correct spacing after list markers)
+MD030: false
+list-marker-space: false
+
+# MD031: Fenced code blocks should be surrounded by blank lines
+MD031: false
+blanks-around-fences: false
+
+# MD032: Lists should be surrounded by blank lines
+MD032: false
+blanks-around-lists: false
+
+# MD033: Inline HTML (disallows raw HTML in markdown)
+MD033: false
+no-inline-html: false
+
+# MD034: Bare URL used (disallows URLs not in angle brackets)
+MD034: false
+no-bare-urls: false
+
+# MD036: Emphasis used instead of a heading (disallows using bold/italic as section headers)
+MD036: false
+no-emphasis-as-heading: false
+
+# MD040: Fenced code blocks should have a language specified
+MD040: false
+fenced-code-language: false
+
+# MD041: First line in file should be a top-level heading
+MD041: false
+first-line-heading: false
+first-line-h1: false
+
+# MD047: Files should end with a single newline character
+MD047: false
+single-trailing-newline: false
+
+# MD051: Link fragment should be valid
+MD051: false
+link-title-style: false
+
+# MD055: Table pipe style (enforces consistent table pipe style)
+MD055: false
+table-pipe-style: false
+
+# MD058: Blank lines around tables (enforces blank lines before/after tables)
+MD058: false
+blanks-around-tables: false
+
