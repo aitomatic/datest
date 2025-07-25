@@ -1,0 +1,23 @@
+// test_simple.na - Basic Dana test file
+// This file tests basic Dana functionality for natest validation
+
+log("🧪 Starting simple Dana test")
+
+// Test basic arithmetic
+result = 2 + 2
+assert result == 4
+log(f"✅ Basic math test passed: 2 + 2 = {result}")
+
+// Test string operations
+greeting = "Hello, Dana!"
+assert greeting.contains("Dana")
+log(f"✅ String test passed: {greeting}")
+
+// Test variable assignment and comparison
+x = 10
+y = 20
+sum_result = x + y
+assert sum_result == 30
+log(f"✅ Variable test passed: {x} + {y} = {sum_result}")
+
+log("🎉 All simple tests completed successfully!") 

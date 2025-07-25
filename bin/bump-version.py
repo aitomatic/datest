@@ -83,9 +83,7 @@ def bump_version(current_version, bump_type):
 def commit_changes(version):
     """Commit the version change"""
     try:
-        subprocess.run(
-            ["git", "add", "pyproject.toml"], check=True, capture_output=True
-        )
+        subprocess.run(["git", "add", "pyproject.toml"], check=True, capture_output=True)
         subprocess.run(
             ["git", "commit", "-m", f"Bump version to {version}"],
             check=True,
@@ -110,9 +108,7 @@ def main():
         action="store_true",
         help="Show what would be done without making changes",
     )
-    parser.add_argument(
-        "--commit", action="store_true", help="Commit the version change"
-    )
+    parser.add_argument("--commit", action="store_true", help="Commit the version change")
 
     args = parser.parse_args()
 

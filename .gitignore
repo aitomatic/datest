@@ -57,7 +57,6 @@ site/
 notebooks/
 proposal/
 uv.lock
-flake8_issues.txt
 node_modules/
 .refactoring_*/
 .cache/

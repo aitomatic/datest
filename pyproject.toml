@@ -160,6 +160,7 @@ exclude = [
     "build",          # Build artifacts
     "dist",           # Distribution files
     "*.egg-info",     # Build artifacts
+    "bin/",           # Utility scripts
 ]
 
 [tool.ruff.lint]

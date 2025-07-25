@@ -1,0 +1,21 @@
+// test_failing.na - Dana test file with intentional failures
+// This file tests natest's ability to handle failing tests
+
+log("🧪 Starting failing Dana test")
+
+// This test should pass
+result = 5 * 3
+assert result == 15
+log(f"✅ Multiplication test passed: 5 * 3 = {result}")
+
+// This test should fail
+wrong_result = 2 + 2
+assert wrong_result == 5  // Intentionally wrong
+log("❌ This assertion should fail")
+
+// Another failing test
+name = "Dana"
+assert name == "Python"  // Intentionally wrong
+log("❌ This string assertion should also fail")
+
+log("🔚 Completed failing test (some failures expected)") 

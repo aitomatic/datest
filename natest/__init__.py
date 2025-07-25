@@ -8,4 +8,4 @@ __version__ = "0.1.0"
 __author__ = "Christopher Nguyen"
 __email__ = "ctn@aitomatic.com"
 
-# Core module imports can be added here as the package grows 
+# Core module imports can be added here as the package grows
