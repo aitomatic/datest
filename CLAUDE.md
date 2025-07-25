@@ -17,28 +17,24 @@ Claude AI Configuration and Guidelines
 ## Essential Commands
 ```bash
 # Core development workflow
-uv run ruff check . && uv run ruff format .    # Lint and format
-uv run pytest tests/ -v                        # Run tests with verbose output (includes .na files)
+ruff check . && ruff format .      # Lint and format
+pytest tests/ -v                   # Run tests with verbose output (includes .na files)
 
-# Natest execution - PREFER .na files for Dana functionality testing
-natest examples/dana/01_language_basics/hello_world.na                      # Direct natest command (recommended)
-natest --debug examples/dana/01_language_basics/hello_world.na              # With debug output
-uv run python -m natest.core.repl.natest examples/dana/01_language_basics/hello_world.na  # Alternative
+# Natest execution - testing Dana (.na) files
+natest test_example.na              # Run Dana test file
+natest --debug test_example.na      # With debug output
+natest tests/                       # Run all .na test files in directory
 
-# Interactive development
-natest                                          # Start Natest framework (recommended)
-uv run python -m natest.core.repl.repl        # Alternative REPL entry point
-
-# Alternative test execution
-uv run python -m pytest tests/
+# Python integration
+pytest tests/                       # Run Python tests
 ```
 
 ## Project Context
-- Natest is a pytest-inspired testing framework for Dana, the agent-first neurosymbolic language
-- Built to provide comprehensive testing capabilities for Dana's unique features
-- Core components: Natest Framework, Dana Testing Primitives
-- Primary language: Python 3.12+
-- Uses uv for dependency management
+- Natest is a minimal pytest-inspired testing framework for Dana, the agent-first neurosymbolic language
+- Built to provide simple testing capabilities for Dana (.na) files
+- Core components: Basic Testing Framework, Dana File Parser
+- Primary language: Python 3.10+
+- Uses standard pip for dependency management
 
 ## File Modification Priority
 1. **NEVER modify core grammar files without extensive testing**
@@ -262,37 +258,35 @@ Requirements:
 ## Context-Aware Development Guide
 
 ### When Working on Natest Code
-- **🎯 ALWAYS create `.na` test files** for Dana functionality testing (not `.py` files)
+- **🎯 Focus on .na file parsing and execution** 
 - **🎯 Use `natest filename.na`** as the primary execution method
-- Test with existing `.na` files in `examples/dana/`
-- Use Natest runtime for execution testing in Python when needed
-- Validate against grammar in `natest/core/lang/parser/dana_grammar.lark`
-- **Use `log()` for examples/testing output** (preferred for color coding)
-- Test Dana code in REPL: `natest` or `uv run python -m natest.core.repl.repl`
-- Check AST output: Enable debug logging in transformer
-- Run through pytest: Copy `test_dana_files.py` to test directory
+- Keep the framework minimal - pytest-inspired for Dana files
+- Use basic Dana grammar parsing with lark
+- **Use `rich` for colored output** (preferred for CLI formatting)
+- Test Dana code execution through natest CLI
+- Focus on test discovery and execution patterns
+- Run through pytest for Python integration tests
 
-### When Working on Agent Testing Framework
-- Test with agent examples in `examples/02_core_concepts/`
-- Use capability mixins from `natest/common/mixins/`
-- Follow resource patterns in `natest/common/resource/`
+### When Working on Dana File Testing
+- Focus on .na file parsing and basic execution
+- Keep test patterns simple and pytest-inspired
+- Use minimal dependencies
 
-### When Working on Common Utilities
-- Keep utilities generic and reusable
-- Document performance implications
-- Use appropriate design patterns
-- Implement proper error handling
+### When Working on Core Utilities
+- Keep utilities minimal and focused
+- Prioritize .na file handling
+- Use standard Python patterns
 
 ## Common Tasks Quick Guide
-- **Adding new Natest function**: See `natest/core/stdlib/`
-- **Creating agent test capability**: Inherit from `natest/frameworks/agent/capability/`
-- **Adding LLM integration**: Use `natest/integrations/llm/`
+- **Adding new test patterns**: Focus on .na file discovery
+- **Extending file parsing**: Use lark grammar parsing
+- **Adding output formatting**: Use rich for CLI output
 
 ## Common Methods and Utilities
 - **Use standard Python logging**: `import logging; logger = logging.getLogger(__name__)`
-- Use configuration from `natest.common.config`
-- Use graph operations from `natest.common.graph`
-- Use IO utilities from `natest.common.io`
+- **File discovery**: Use pathlib for .na file finding
+- **Output formatting**: Use rich for colored terminal output
+- **CLI handling**: Use click for command-line interface
 
 ## Testing & Security Essentials
 - **Prefer `.na` (Dana) test files** over `.py` for Dana-specific functionality
@@ -332,32 +326,26 @@ natest test_my_feature.na
 # 2. With debug output
 natest --debug test_my_feature.na
 
-# 3. Via Python module
-uv run python -m natest.core.repl.natest test_my_feature.na
+# 3. Run directory of tests
+natest tests/
 
-# 4. Interactive REPL for development
-natest                                  # Start REPL
-uv run python -m natest.core.repl.repl # Direct REPL access
-
-# 5. Through pytest (automatic discovery)
-pytest tests/my_directory/test_dana_files.py -v  # Runs all test_*.na files
+# 4. Through pytest (for Python integration)
+pytest tests/ -v
 ```
 
 ### ✅ **When to Use Each Method**
-- **`.na` files**: For Dana-specific functionality testing with Natest
-- **`.py` files**: Only for Python-specific testing (imports, integrations)
-- **pytest**: Automated testing and CI/CD pipelines
-- **natest command**: Direct execution and development
-- **REPL**: Interactive development and debugging
+- **`.na` files**: For Dana test files using natest
+- **`.py` files**: For Python integration tests using pytest
+- **natest command**: Direct .na file execution and testing
+- **pytest**: CI/CD and Python test integration
 
 ## Natest-Specific Debugging & Validation
-- **Use `log()` for examples/testing output** (provides color coding and better debugging)
-- **Prefer creating `.na` test files** over `.py` for Dana functionality testing
-- Test Dana code in REPL: `uv run python -m natest.core.repl.repl`
-- Check AST output: Enable debug logging in transformer
-- Validate against grammar: `natest/core/lang/parser/dana_grammar.lark`
-- Test with existing `.na` files in `examples/dana/`
-- Execute `.na` files: `natest filename.na` or `uv run python -m natest.core.repl.natest filename.na`
+- **Use `rich` for colored output** (provides better CLI formatting)
+- **Focus on `.na` test files** for Dana functionality testing
+- Keep parsing simple with lark grammar
+- Test file discovery and execution patterns
+- Execute `.na` files: `natest filename.na`
+- Debug with: `natest --debug filename.na`
 
 ## Security & Performance
 - **Natest Runtime Security**: Never expose Natest runtime instances to untrusted code

@@ -8,7 +8,7 @@
 ---
 > **What if testing agent-first neurosymbolic systems was as intuitive as testing Python?**
 
-Traditional testing frameworks fall short when it comes to Dana's agent-first neurosymbolic language. Natest bridges this gap by providing a pytest-inspired testing experience specifically designed for Dana's unique features: agent behaviors, reason() calls, context-aware functions, and self-improving pipelines.
+Traditional testing frameworks don't natively support Dana (.na) files. Natest bridges this gap by providing a minimal, pytest-inspired testing framework specifically designed to discover, parse, and execute Dana test files with familiar pytest-like patterns.
 
 ## TL;DR - Get Running in 30 Seconds! 🚀
 
@@ -29,117 +29,83 @@ See the full documentation at: [https://aitomatic.github.io/natest/](https://ait
 
 ## Why Natest?
 
-Natest transforms Dana testing from ad-hoc validation to systematic, reliable verification through purpose-built testing primitives:
-- **🤖 Agent-Native**: Purpose-built for testing multi-agent Dana systems
-- **🛡️ Reliable**: Built-in verification for reason() calls and agent behaviors
-- **⚡ Fast**: 10x faster test development with Dana-aware assertions
-- **🧠 Context-Aware**: Test reason() calls that adapt output types automatically
-- **🔄 Self-Improving**: Test functions that learn and optimize through POET
-- **🌐 Domain-Expert**: Test specialized Dana agent knowledge and expertise
-- **🔍 Transparent**: Every agent interaction is visible and debuggable
-- **🤝 Collaborative**: Share and reuse working test suites across Dana projects
+Natest provides a minimal, focused testing framework for Dana files:
+- **📁 File Discovery**: Automatically finds and runs `.na` test files
+- **🔍 Pytest-Inspired**: Familiar patterns and command-line interface
+- **⚡ Simple**: Minimal dependencies, focused on core functionality
+- **🎨 Rich Output**: Colored terminal output for clear test results
+- **🔧 Extensible**: Optional LLM integration for advanced Dana testing
+- **📋 Standards**: Follows pytest conventions where possible
 
-## Core Innovation: Dana-Native Testing
+## Core Innovation: Simple Dana File Testing
 
-Natest provides Dana-native testing primitives that understand agent behaviors, reason() calls, and neurosymbolic operations:
+Natest provides a minimal framework for testing Dana (.na) files:
 
-```python
-# Traditional testing: Opaque, brittle
-def test_agent():
-    result = agent.process(data)
-    assert result is not None  # Limited validation
+```bash
+# Traditional testing: No .na file support
+pytest test_example.py  # Only Python files
 
-# Natest: Transparent, comprehensive with Dana-aware assertions
-def test_agent():
-    with natest.agent_context(agent) as ctx:
-        result = ctx.reason("analyze data", context=data)
-        
-        # Test agent reasoning
-        assert ctx.reasoning_steps > 2
-        assert ctx.confidence > 0.8
-        assert isinstance(result, dict)
-        
-        # Test context awareness
-        detailed: dict = ctx.reason("analyze data", context=data)
-        summary: str = ctx.reason("analyze data", context=data)
-        assert detailed != summary  # Different types, same reasoning
+# Natest: Direct .na file testing
+natest test_example.na  # Native Dana file execution
+natest tests/           # Run all .na files in directory
+natest --debug test.na  # Debug Dana file execution
 ```
 
-**Dana-Native Testing**: Test agents as first-class entities:
-```python
-@natest.agent_test
-def test_financial_analyst():
-    agent = FinancialAnalyst()
-    portfolio = load_test_portfolio()
-    
-    # Test agent capabilities
-    assessment = agent.assess_portfolio(portfolio)
-    assert_agent_reasoning(assessment, min_confidence=0.9)
-    assert_agent_context_used(agent, portfolio)
+**File Discovery**: Automatic .na file detection:
+```bash
+# Natest finds and runs Dana test files
+natest tests/
+# Runs: test_basic.na, test_advanced.na, etc.
 ```
 
-**Context-Aware Validation**: Test reason() calls with type awareness:
-```python
-@natest.reason_test
-def test_portfolio_analysis():
-    portfolio = test_portfolio()
-    
-    # Test different return types from same reasoning
-    risk_score: float = reason("assess portfolio risk", context=portfolio)
-    risk_details: dict = reason("assess portfolio risk", context=portfolio) 
-    risk_report: str = reason("assess portfolio risk", context=portfolio)
-    
-    # Validate type-specific behavior
-    assert 0.0 <= risk_score <= 1.0
-    assert "risk_factors" in risk_details
-    assert "Portfolio Risk Assessment" in risk_report
+**Pytest Integration**: Use both frameworks together:
+```bash
+# Python integration tests
+pytest tests/
+
+# Dana file tests  
+natest tests/
+
+# Combined workflow
+make test  # Runs both pytest and natest
 ```
 
-**Self-Improving Pipeline Testing**: Test POET optimization:
-```python
-@natest.poet_test
-def test_pipeline_learning():
-    pipeline = portfolio | risk_assessment | recommendation_engine
-    
-    # Test baseline performance
-    baseline_result = pipeline.process(test_data)
-    
-    # Simulate learning
-    pipeline.learn_from_feedback(expert_feedback)
-    
-    # Test improvement
-    improved_result = pipeline.process(test_data)
-    assert_improvement(improved_result, baseline_result)
+**Rich Output**: Clear, colored test results:
+```bash
+natest test_example.na
+✅ test_basic_math ... PASSED
+❌ test_advanced_logic ... FAILED
+📊 2 tests, 1 passed, 1 failed
 ```
 
 ---
 
 ## Get Started
 
-### 🛠️ **For Engineers** - Test Dana Systems
-→ **[Testing Guide](docs/for-engineers/README.md)** - Practical guides, test patterns, and references
+### 🛠️ **For Engineers** - Test Dana Files
+→ **[Testing Guide](docs/for-engineers/README.md)** - Simple patterns for .na file testing
 
-Complete Natest framework reference, Dana testing patterns, agent test recipes.
+Basic Natest usage, file discovery patterns, integration with pytest.
 
-**Quick starts:** [5-minute setup](docs/for-engineers/README.md#quick-start) | [Natest patterns guide](docs/for-engineers/reference/natest-patterns.md) | [Test recipe collection](docs/for-engineers/recipes/README.md)
+**Quick starts:** [5-minute setup](docs/for-engineers/README.md#quick-start) | [File patterns](docs/for-engineers/reference/file-patterns.md) | [CLI usage](docs/for-engineers/cli-usage.md)
 
 ---
 
-### 🔍 **For Evaluators** - Assess Natest for Dana Testing
-→ **[Evaluation Guide](docs/for-evaluators/README.md)** - Comparisons, ROI analysis, and proof of concepts
+### 🔍 **For Evaluators** - Assess Natest vs Alternatives
+→ **[Evaluation Guide](docs/for-evaluators/README.md)** - Simple comparisons and use cases
 
-ROI calculator for testing efficiency, competitive analysis vs pytest/unittest, Dana testing assessment frameworks.
+When to use natest vs pytest, integration patterns, minimal testing approaches.
 
-**Quick starts:** [30-second assessment](docs/for-evaluators/README.md#quick-evaluation-framework) | [Testing ROI calculator](docs/for-evaluators/roi-analysis/calculator.md) | [Technical overview](docs/for-evaluators/comparison/technical-overview.md)
+**Quick starts:** [Comparison](docs/for-evaluators/comparison.md) | [Use cases](docs/for-evaluators/use-cases.md) | [Integration](docs/for-evaluators/integration.md)
 
 ---
 
 ### 🏗️ **For Contributors** - Extend Natest
-→ **[Contributor Guide](docs/for-contributors/README.md)** - Architecture, codebase, and development guides
+→ **[Contributor Guide](docs/for-contributors/README.md)** - Simple architecture and patterns
 
-Complete architecture deep dive, custom assertion development, Dana integration patterns.
+Basic framework structure, file parsing extensions, output formatting.
 
-**Quick starts:** [Development setup](docs/for-contributors/README.md#quick-start-for-contributors) | [Custom assertions](docs/for-contributors/extending/assertion-development.md) | [Architecture overview](docs/for-contributors/architecture/system-design.md)
+**Quick starts:** [Development setup](docs/for-contributors/README.md#quick-start) | [Parser extensions](docs/for-contributors/extending-parser.md) | [Output formatting](docs/for-contributors/output-formatting.md)
 
 ---
 
@@ -158,8 +124,8 @@ make lint         # Check code style
 make format       # Format code
 make fix          # Auto-fix code issues
 
-# Natest Development
-make natest       # Start Natest framework for interactive development
+# Natest Usage
+make natest       # Show natest command help
 
 # Documentation
 make docs-serve   # Live preview docs during development
