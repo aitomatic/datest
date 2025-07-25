@@ -5,7 +5,7 @@
 # Natest Development Makefile - Essential Commands Only
 # =============================================================================
 
-# Simplified dependency management - using standard pip
+# Modern dependency management - using uv (with pip fallback)
 
 # Default target
 .DEFAULT_GOAL := help
@@ -13,7 +13,8 @@
 # All targets are phony (don't create files)
 .PHONY: help help-more quickstart install setup-dev sync test dana clean lint format fix check mypy \
 	install-ollama start-ollama install-vllm start-vllm install-vscode install-cursor install-vim install-emacs \
-	docs-serve docs-build docs-deps test-fast test-cov update-deps dev security validate-config release-check
+	docs-serve docs-build docs-deps test-fast test-cov update-deps dev security validate-config release-check \
+	sync-dev lock-deps check-uv
 
 # =============================================================================
 # Help & Quick Start
@@ -26,8 +27,9 @@ help: ## Show essential Natest commands
 	@echo ""
 	@echo "\033[1mGetting Started:\033[0m"
 	@echo "  \033[36mquickstart\033[0m      🚀 Get Natest running in 30 seconds!"
-	@echo "  \033[36minstall\033[0m         📦 Install package and dependencies"
+	@echo "  \033[36minstall\033[0m         📦 Install package and dependencies (uv preferred)"
 	@echo "  \033[36msetup-dev\033[0m       🛠️  Install with development dependencies"
+	@echo "  \033[36msync\033[0m            ⚡ Fast dependency sync with uv"
 	@echo ""
 	@echo "\033[1mUsing Natest:\033[0m"
 	@echo "  \033[36mnatest\033[0m          🚀 Start the Natest framework"
@@ -45,6 +47,7 @@ help: ## Show essential Natest commands
 	@echo "  \033[36mclean\033[0m           🧹 Clean build artifacts and caches"
 	@echo ""
 	@echo "\033[33mTip: Run 'make help-more' for additional commands\033[0m"
+	@echo "\033[33mNote: Install uv for faster dependency management: pip install uv\033[0m"
 	@echo ""
 
 help-more: ## Show all available commands including advanced ones
@@ -53,7 +56,7 @@ help-more: ## Show all available commands including advanced ones
 	@echo "\033[1m===========================================\033[0m"
 	@echo ""
 	@echo "\033[1mGetting Started:\033[0m"
-	@awk 'BEGIN {FS = ":.*?## "} /^(quickstart|install|setup-dev|sync).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^(quickstart|install|setup-dev|sync|sync-dev|lock-deps|check-uv).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "\033[1mUsing Dana:\033[0m"
 	@awk 'BEGIN {FS = ":.*?## "} /^(dana|test|run).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -80,7 +83,12 @@ quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
 	@echo "===================="
 	@echo ""
 	@echo "📦 Installing dependencies..."
-	@pip install -e .
+	@if command -v uv >/dev/null 2>&1; then \
+		uv pip install -e .; \
+	else \
+		echo "⚠️  uv not found, falling back to pip..."; \
+		pip install -e .; \
+	fi
 	@echo "🔧 Setting up environment..."
 	@if [ ! -f .env ]; then \
 		cp .env.example .env; \
@@ -96,6 +104,7 @@ quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
 	@echo "  \033[36mmake test\033[0m    # Run tests"
 	@echo ""
 	@echo "\033[33m💡 Tip: Run 'open .env' to edit your API keys\033[0m"
+	@echo "\033[33m💡 For faster installs, install uv: pip install uv\033[0m"
 	@echo ""
 
 # =============================================================================
@@ -104,18 +113,59 @@ quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
 
 install: ## Install package and dependencies
 	@echo "📦 Installing dependencies..."
-	pip install -e .
+	@if command -v uv >/dev/null 2>&1; then \
+		echo "⚡ Using uv for fast installation..."; \
+		uv pip install -e .; \
+	else \
+		echo "⚠️  uv not found, using pip (install uv for faster builds: pip install uv)"; \
+		pip install -e .; \
+	fi
 
 setup-dev: ## Install with development dependencies and setup tools
 	@echo "🛠️  Installing development dependencies..."
-	pip install -e ".[dev]"
+	@if command -v uv >/dev/null 2>&1; then \
+		echo "⚡ Using uv for fast installation..."; \
+		uv pip install -e ".[dev]"; \
+	else \
+		echo "⚠️  uv not found, using pip (install uv for faster builds: pip install uv)"; \
+		pip install -e ".[dev]"; \
+	fi
 	@echo "🔧 Setting up development tools..."
 	pre-commit install
 	@echo "✅ Development environment ready!"
 
+sync: check-uv ## Fast dependency sync with uv
+	@echo "⚡ Syncing dependencies with uv..."
+	uv pip sync pyproject.toml
+
+sync-dev: check-uv ## Fast sync with development dependencies
+	@echo "⚡ Syncing development dependencies with uv..."
+	uv pip install -e ".[dev]"
+
+lock-deps: check-uv ## Generate/update dependency lock file
+	@echo "🔒 Locking dependencies..."
+	@if [ -f requirements.in ]; then \
+		uv pip compile requirements.in -o requirements.txt; \
+	else \
+		echo "📝 No requirements.in found, using pyproject.toml"; \
+		uv pip compile pyproject.toml -o requirements-lock.txt; \
+	fi
+
+check-uv: ## Check if uv is available
+	@if ! command -v uv >/dev/null 2>&1; then \
+		echo "❌ uv not found!"; \
+		echo "💡 Install with: pip install uv"; \
+		echo "🌐 Or visit: https://docs.astral.sh/uv/"; \
+		exit 1; \
+	fi
+
 install-llm: ## Install optional LLM integration for testing reason() calls
 	@echo "🤖 Installing LLM integration..."
-	pip install -e ".[llm]"
+	@if command -v uv >/dev/null 2>&1; then \
+		uv pip install -e ".[llm]"; \
+	else \
+		pip install -e ".[llm]"; \
+	fi
 
 # =============================================================================
 # Usage
@@ -160,10 +210,6 @@ mypy: ## Run type checking
 # Optional Extensions
 # =============================================================================
 
-install-llm: ## Install optional LLM integration for testing reason() calls
-	@echo "🤖 Installing LLM integration..."
-	pip install -e ".[llm]"
-
 # =============================================================================
 # Maintenance & Documentation
 # =============================================================================
@@ -193,7 +239,11 @@ docs-build: ## MORE: Build documentation
 
 docs-deps: ## MORE: Install documentation dependencies
 	@echo "📚 Installing documentation dependencies..."
-	pip install -e ".[docs]"
+	@if command -v uv >/dev/null 2>&1; then \
+		uv pip install -e ".[docs]"; \
+	else \
+		pip install -e ".[docs]"; \
+	fi
 
 # =============================================================================
 # Advanced/Comprehensive Targets (shown in help-more)
