@@ -1,0 +1,39 @@
+[tool.poetry]
+authors = ["Aitomatic Engineering <engineering@aitomatic.com>"]
+description = "OpenSSM - 'Small Specialist Models' for Industrial AI"
+name = "openssm"
+packages = [
+  {include = "openssm"},
+]
+readme = "README.md"
+version = "0.1.6"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<4.0"
+python-dotenv = ">=0.19.0"
+pydantic = ">=1.10"
+openai = ">=0.27"
+# LlamaIndex & related
+llama-hub = ">=0.0.25"
+llama-index = ">=0.8.8"
+nltk = ">=3.8.1"  # used by LlamaIndex / LlamaHub plugins during indexing
+docx2txt = ">=0.8"  # for reading .docx files
+pypdf = ">=3.15.2"  # for reading .pdf files
+pycryptodome = ">=3.18.0"  # for reading .pdf files: PyCryptodome is required for AES algorithm
+# misc / other
+pytest = ">=7.0.0"
+google-api-python-client = ">=2.0"
+
+
+[tool.pytest.ini_options]
+addopts = [
+  "--import-mode=importlib",
+]
+filterwarnings = [
+  "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
+  "ignore:Deprecated call to `pkg_resources.declare_namespace.*google.*:DeprecationWarning",
+]
