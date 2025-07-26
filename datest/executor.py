@@ -8,7 +8,7 @@ import logging
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from .assertions import DanaAssertionParser
 from .models import DanaTestResult
@@ -47,9 +47,11 @@ class DanaTestExecutor:
 
             # Parse assertions from output
             assertions = self.assertion_parser.parse_output(result.stdout, result.stderr)
-            
+
             # Determine success based on exit code and assertions
-            has_failed_assertions = any(not a.passed for a in assertions if a.assertion_type == "assert")
+            has_failed_assertions = any(
+                not a.passed for a in assertions if a.assertion_type == "assert"
+            )
             success = result.returncode == 0 and not has_failed_assertions
 
             logger.debug(
@@ -63,7 +65,7 @@ class DanaTestExecutor:
                 output=result.stdout,
                 errors=result.stderr,
                 exit_code=result.returncode,
-                assertions=assertions
+                assertions=assertions,
             )
 
         except subprocess.TimeoutExpired:
@@ -103,11 +105,11 @@ class DanaTestExecutor:
     def _run_subprocess(self, file_path: Path) -> subprocess.CompletedProcess:
         """Run Dana file using subprocess"""
         cmd = [self.dana_command]
-        
+
         # Add JSON output flag if requested
         if self.use_json_output:
             cmd.append("--output-json")
-            
+
         cmd.append(str(file_path))
 
         logger.debug(f"Running command: {' '.join(cmd)}")

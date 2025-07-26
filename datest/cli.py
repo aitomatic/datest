@@ -36,14 +36,14 @@ logger = logging.getLogger(__name__)
 @click.option("--no-color", is_flag=True, help="Disable colored output")
 @click.argument("test_paths", nargs=-1, type=click.Path(exists=True))
 def main(
-    verbose: bool, 
-    pattern: tuple[str, ...], 
-    discover_only: bool, 
+    verbose: bool,
+    pattern: tuple[str, ...],
+    discover_only: bool,
     config: str | None,
     json: bool,
     timeout: float | None,
     no_color: bool,
-    test_paths: tuple[str, ...]
+    test_paths: tuple[str, ...],
 ) -> None:
     """
     Datest: Testing framework for Dana language files.
@@ -62,27 +62,24 @@ def main(
         datest_config = DatestConfig.load_from_file(config_path)
     else:
         datest_config = DatestConfig.find_and_load()
-    
+
     # Apply command line overrides
     if verbose:
         datest_config.verbose = True
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger("datest").setLevel(logging.DEBUG)
-    
+
     if json:
         datest_config.use_json_output = True
-    
+
     if timeout is not None:
         datest_config.timeout = timeout
-    
+
     if no_color:
         datest_config.use_color = False
 
     # Initialize components
-    reporter = DanaTestReporter(
-        use_color=datest_config.use_color, 
-        verbose=datest_config.verbose
-    )
+    reporter = DanaTestReporter(use_color=datest_config.use_color, verbose=datest_config.verbose)
 
     # Show header
     click.echo("🧪 Datest - Testing framework for Dana language")
@@ -102,7 +99,7 @@ def main(
         patterns=datest_config.test_patterns if not pattern else list(pattern),
         exclude_patterns=datest_config.exclude_patterns,
         recursive=datest_config.recursive,
-        max_depth=datest_config.max_depth
+        max_depth=datest_config.max_depth,
     )
 
     discovery = DanaTestDiscovery(discovery_config)
