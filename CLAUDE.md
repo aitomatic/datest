@@ -1,13 +1,13 @@
-# Natest - Pytest-Inspired Testing Framework for Dana
+# Datest - Pytest-Inspired Testing Framework for Dana
 
 Claude AI Configuration and Guidelines
 
 ## Quick Reference - Critical Rules
 🚨 **MUST FOLLOW IMMEDIATELY**
 - Use standard Python logging: `import logging; logger = logging.getLogger(__name__)`
-- Apply appropriate logging patterns for Natest development
+- Apply appropriate logging patterns for Datest development
 - Always use f-strings: `f"Value: {var}"` not `"Value: " + str(var)`
-- Natest modules: `import math_utils` (no .na), Python modules: `import math.py`
+- Datest modules: `import math_utils` (no .na), Python modules: `import math.py`
 - **ALL temporary development files go in `tmp/` directory**
 - Run `uv run ruff check . && uv run ruff format .` before commits
 - Use type hints: `def func(x: int) -> str:` (required)
@@ -20,17 +20,17 @@ Claude AI Configuration and Guidelines
 ruff check . && ruff format .      # Lint and format
 pytest tests/ -v                   # Run tests with verbose output (includes .na files)
 
-# Natest execution - testing Dana (.na) files
-natest test_example.na              # Run Dana test file
-natest --debug test_example.na      # With debug output
-natest tests/                       # Run all .na test files in directory
+# Datest execution - testing Dana (.na) files
+datest test_example.na              # Run Dana test file
+datest --debug test_example.na      # With debug output
+datest tests/                       # Run all .na test files in directory
 
 # Python integration
 pytest tests/                       # Run Python tests
 ```
 
 ## Project Context
-- Natest is a minimal pytest-inspired testing framework for Dana, the agent-first neurosymbolic language
+- Datest is a minimal pytest-inspired testing framework for Dana, the agent-first neurosymbolic language
 - Built to provide simple testing capabilities for Dana (.na) files
 - Core components: Basic Testing Framework, Dana File Parser
 - Primary language: Python 3.10+
@@ -42,18 +42,18 @@ pytest tests/                       # Run Python tests
 3. **ALL temporary development files go in `tmp/` directory**
 4. **Prefer editing existing files over creating new ones**
 
-## Dana Language Testing with Natest
+## Dana Language Testing with Datest
 
 For comprehensive Dana language testing documentation including test patterns, assertion methods, agent testing, and neurosymbolic validation, see:
 
-**📖 [docs/.ai-only/natest-lang.md](natest-lang.md) - Complete Natest Testing Reference**
+**📖 [docs/.ai-only/datest-lang.md](datest-lang.md) - Complete Datest Testing Reference**
 
-Natest provides pytest-inspired testing capabilities specifically designed for Dana's agent-first neurosymbolic language.
+Datest provides pytest-inspired testing capabilities specifically designed for Dana's agent-first neurosymbolic language.
 
-Quick Natest reminders:
-- **Natest modules**: `import math_utils` (no .na), **Python modules**: `import math.py`
+Quick Datest reminders:
+- **Datest modules**: `import math_utils` (no .na), **Python modules**: `import math.py`
 - **Use `log()` for examples/testing output** (preferred for color coding and debugging)
-- **For Natest INFO logging to show**: Use `log_level("INFO", "natest")` (default is WARNING level)
+- **For Datest INFO logging to show**: Use `log_level("INFO", "datest")` (default is WARNING level)
 - **Always use f-strings**: `f"Value: {var}"` not `"Value: " + str(var)`
 - **Type hints required**: `def func(x: int) -> str:` (mandatory)
 - **Named arguments for structs**: `Point(x=5, y=10)` not `Point(5, 10)`
@@ -61,7 +61,7 @@ Quick Natest reminders:
 
 ### Exception Handling Syntax
 
-Dana supports comprehensive exception handling with variable assignment (tested with Natest):
+Dana supports comprehensive exception handling with variable assignment (tested with Datest):
 
 ```dana
 # Exception variable assignment - access exception details
@@ -235,7 +235,7 @@ Every error message must follow this template:
 "[What failed]: [Why it failed]. [What user can do]. [Available alternatives]"
 
 Example:
-"Natest module 'math_utils' not found: File does not exist in search paths. 
+"Datest module 'math_utils' not found: File does not exist in search paths. 
 Check module name spelling or verify file exists. 
 Available modules: simple_math, string_utils"
 
@@ -250,20 +250,20 @@ Requirements:
 - **ALL temporary files go in `tmp/` directory**
 - Never create test files in project root
 - Use meaningful prefixes: `tmp_test_`, `tmp_debug_`
-- Core framework code: `natest/`
+- Core framework code: `datest/`
 - Tests: `tests/` (matching source structure)
 - Examples: `examples/`
 - Documentation: `docs/`
 
 ## Context-Aware Development Guide
 
-### When Working on Natest Code
+### When Working on Datest Code
 - **🎯 Focus on .na file parsing and execution** 
-- **🎯 Use `natest filename.na`** as the primary execution method
+- **🎯 Use `datest filename.na`** as the primary execution method
 - Keep the framework minimal - pytest-inspired for Dana files
 - Use basic Dana grammar parsing with lark
 - **Use `rich` for colored output** (preferred for CLI formatting)
-- Test Dana code execution through natest CLI
+- Test Dana code execution through datest CLI
 - Focus on test discovery and execution patterns
 - Run through pytest for Python integration tests
 
@@ -296,59 +296,59 @@ Requirements:
 - Use environment variables for configuration
 - Validate all inputs
 
-## Natest File Guidelines
-- **Create `test_*.na` files** for Dana functionality testing with Natest
+## Datest File Guidelines
+- **Create `test_*.na` files** for Dana functionality testing with Datest
 - Use `log()` statements for test output and debugging (provides color coding)
 - pytest automatically discovers and runs `.na` test files
-- Run `.na` files directly: `natest test_example.na` or `uv run python -m natest.core.repl.natest test_example.na`
+- Run `.na` files directly: `datest test_example.na` or `uv run python -m datest.core.repl.datest test_example.na`
 
-## Natest Execution Quick Guide
-**Always prefer `.na` test files for Dana functionality testing with Natest**
+## Datest Execution Quick Guide
+**Always prefer `.na` test files for Dana functionality testing with Datest**
 
 ### 📁 **Create `.na` Test Files**
 ```dana
 # test_my_feature.na
-log("🧪 Testing My Feature with Natest")
+log("🧪 Testing My Feature with Datest")
 
 # Test basic functionality
 result = my_function(5)
 assert result == 10
 log("✅ Basic test passed")
 
-log("🎉 All Natest tests passed!")
+log("🎉 All Datest tests passed!")
 ```
 
 ### 🏃 **Multiple Ways to Run `.na` Files**
 ```bash
-# 1. Direct natest command (recommended)
-natest test_my_feature.na
+# 1. Direct datest command (recommended)
+datest test_my_feature.na
 
 # 2. With debug output
-natest --debug test_my_feature.na
+datest --debug test_my_feature.na
 
 # 3. Run directory of tests
-natest tests/
+datest tests/
 
 # 4. Through pytest (for Python integration)
 pytest tests/ -v
 ```
 
 ### ✅ **When to Use Each Method**
-- **`.na` files**: For Dana test files using natest
+- **`.na` files**: For Dana test files using datest
 - **`.py` files**: For Python integration tests using pytest
-- **natest command**: Direct .na file execution and testing
+- **datest command**: Direct .na file execution and testing
 - **pytest**: CI/CD and Python test integration
 
-## Natest-Specific Debugging & Validation
+## Datest-Specific Debugging & Validation
 - **Use `rich` for colored output** (provides better CLI formatting)
 - **Focus on `.na` test files** for Dana functionality testing
 - Keep parsing simple with lark grammar
 - Test file discovery and execution patterns
-- Execute `.na` files: `natest filename.na`
-- Debug with: `natest --debug filename.na`
+- Execute `.na` files: `datest filename.na`
+- Debug with: `datest --debug filename.na`
 
 ## Security & Performance
-- **Natest Runtime Security**: Never expose Natest runtime instances to untrusted code
+- **Datest Runtime Security**: Never expose Datest runtime instances to untrusted code
 - **LLM Resource Management**: Always use proper configuration management for model configuration
 - Profile code for performance bottlenecks
 - Cache expensive operations

@@ -1,5 +1,5 @@
 // test_error.na - Dana test file with syntax errors
-// This file tests natest's ability to handle Dana syntax errors
+// This file tests datest's ability to handle Dana syntax errors
 
 log("🧪 Starting error Dana test")
 

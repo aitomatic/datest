@@ -1,8 +1,8 @@
-site_name: Natest - Pytest-Inspired Testing Framework for Dana
-site_description: Comprehensive documentation for Natest - Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language
-site_url: https://natest.readthedocs.io/
-repo_url: https://github.com/aitomatic/natest
-repo_name: aitomatic/natest
+site_name: Datest - Pytest-Inspired Testing Framework for Dana
+site_description: Comprehensive documentation for Datest - Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language
+site_url: https://datest.readthedocs.io/
+repo_url: https://github.com/aitomatic/datest
+repo_name: aitomatic/datest
 
 # Documentation and theme
 theme:
@@ -210,7 +210,7 @@ markdown_extensions:
   - pymdownx.magiclink:
       repo_url_shorthand: true
       user: aitomatic
-      repo: natest
+      repo: datest
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.snippets
@@ -229,9 +229,9 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/aitomatic/natest
+      link: https://github.com/aitomatic/datest
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/natest/
+      link: https://pypi.org/project/datest/
 
 # Documentation directory
 docs_dir: docs

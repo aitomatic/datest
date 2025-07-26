@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Command-line interface for Natest.
+Command-line interface for Datest.
 
 Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 """
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.command()
-@click.version_option(version="0.1.0", prog_name="natest")
+@click.version_option(version="0.1.0", prog_name="datest")
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output and debug logging")
 @click.option(
     "--pattern", "-p", multiple=True, help="Test file patterns (default: test_*.na, *_test.na)"
@@ -34,26 +34,26 @@ def main(
     verbose: bool, pattern: tuple[str, ...], discover_only: bool, test_paths: tuple[str, ...]
 ) -> None:
     """
-    Natest: Testing framework for Dana language files.
+    Datest: Testing framework for Dana language files.
 
     Discovers and runs tests in .na (Dana) files.
 
     Examples:
-        natest tests/                    # Run all tests in tests/ directory
-        natest test_example.na           # Run specific test file
-        natest --discover-only tests/    # Only show discovered files
-        natest -v tests/                 # Verbose output
+        datest tests/                    # Run all tests in tests/ directory
+        datest test_example.na           # Run specific test file
+        datest --discover-only tests/    # Only show discovered files
+        datest -v tests/                 # Verbose output
     """
     # Configure logging level
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-        logging.getLogger("natest").setLevel(logging.DEBUG)
+        logging.getLogger("datest").setLevel(logging.DEBUG)
 
     # Initialize components
     reporter = DanaTestReporter(use_color=True, verbose=verbose)
 
     # Show header
-    click.echo("🧪 Natest - Testing framework for Dana language")
+    click.echo("🧪 Datest - Testing framework for Dana language")
     if verbose:
         click.echo("Debug logging enabled")
 
@@ -123,7 +123,7 @@ def main(
     except Exception as e:
         reporter.print_error(str(e))
         if verbose:
-            logger.exception("Unexpected error in natest")
+            logger.exception("Unexpected error in datest")
         sys.exit(2)
 
 

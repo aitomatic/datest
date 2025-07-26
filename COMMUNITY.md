@@ -22,7 +22,7 @@ Natest is open source software under the MIT license. While you're free to use i
 As Aitomatic (the creator), we'll continue developing both open and commercial tools in the Natest ecosystem. We invite you to join us in building something great together.
 
 - [Learn more](https://aitomatic.com)
-- [GitHub](https://github.com/aitomatic/natest)
+- [GitHub](https://github.com/aitomatic/datest)
 - [Discord](https://discord.gg/6jGD4PYk)
 
 ---

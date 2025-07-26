@@ -1,5 +1,5 @@
 """
-Natest: Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language.
+Datest: Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language.
 
 Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 """

@@ -1,4 +1,4 @@
-# pyproject.toml - Natest Project Configuration
+# pyproject.toml - Datest Project Configuration
 # Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 
 # =============================================================================
@@ -14,9 +14,9 @@ build-backend = "hatchling.build"
 # =============================================================================
 
 [project]
-name = "natest"
+name = "datest"
 version = "0.1.0"
-description = "Natest: Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language"
+description = "Datest: Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -88,18 +88,18 @@ test = [
     "pytest-xdist>=3.6.0,<4.0.0",  # Parallel test execution
 ]
 
-all = ["natest[dev,llm,docs,test]"]
+all = ["datest[dev,llm,docs,test]"]
 
 # Command-line entry points
 [project.scripts]
-natest = "natest.cli:main"
+datest = "datest.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/aitomatic/natest"
-Documentation = "https://natest.readthedocs.io/"
-Repository = "https://github.com/aitomatic/natest.git"
-Issues = "https://github.com/aitomatic/natest/issues"
-Changelog = "https://github.com/aitomatic/natest/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/aitomatic/datest"
+Documentation = "https://datest.readthedocs.io/"
+Repository = "https://github.com/aitomatic/datest.git"
+Issues = "https://github.com/aitomatic/datest/issues"
+Changelog = "https://github.com/aitomatic/datest/blob/main/CHANGELOG.md"
 
 # =============================================================================
 # UV Configuration
@@ -128,7 +128,7 @@ members = ["."]
 # =============================================================================
 
 [tool.hatch.build.targets.wheel]
-packages = ["natest"]
+packages = ["datest"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -142,7 +142,7 @@ exclude = [
 ]
 
 [tool.hatch.version]
-path = "natest/__init__.py"
+path = "datest/__init__.py"
 
 # =============================================================================
 # Code Quality Tools
@@ -151,7 +151,7 @@ path = "natest/__init__.py"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-src = ["natest", "tests"]
+src = ["datest", "tests"]
 exclude = [
     "*.na",           # Dana language files
     ".git",           # Version control
@@ -171,7 +171,7 @@ ignore = ["E501", "B008"]
 "tests/*" = ["SIM118"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["natest"]
+known-first-party = ["datest"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -194,7 +194,7 @@ warn_unused_ignores = true
 show_error_codes = true
 
 # Paths to check
-files = ["natest", "tests"]
+files = ["datest", "tests"]
 
 [[tool.mypy.overrides]]
 module = "tests.*"
@@ -218,7 +218,7 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "-ra",
-    "--cov=natest",
+    "--cov=datest",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
@@ -239,10 +239,10 @@ markers = [
 # =============================================================================
 
 [tool.coverage.run]
-source = ["natest"]
+source = ["datest"]
 branch = true
 omit = [
-    "natest/__main__.py",
+    "datest/__main__.py",
     "tests/*",
     "*/site-packages/*",
 ]

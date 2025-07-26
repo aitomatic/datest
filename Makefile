@@ -1,8 +1,8 @@
-# Makefile - Natest Development Commands
+# Makefile - Datest Development Commands
 # Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 
 # =============================================================================
-# Natest Development Makefile - Essential Commands Only
+# Datest Development Makefile - Essential Commands Only
 # =============================================================================
 
 # Modern dependency management - using uv (with pip fallback)
@@ -20,19 +20,19 @@
 # Help & Quick Start
 # =============================================================================
 
-help: ## Show essential Natest commands
+help: ## Show essential Datest commands
 	@echo ""
-	@echo "\033[1m\033[34mNatest Development Commands\033[0m"
+	@echo "\033[1m\033[34mDatest Development Commands\033[0m"
 	@echo "\033[1m======================================\033[0m"
 	@echo ""
 	@echo "\033[1mGetting Started:\033[0m"
-	@echo "  \033[36mquickstart\033[0m      🚀 Get Natest running in 30 seconds!"
+	@echo "  \033[36mquickstart\033[0m      🚀 Get Datest running in 30 seconds!"
 	@echo "  \033[36minstall\033[0m         📦 Install package and dependencies (uv preferred)"
 	@echo "  \033[36msetup-dev\033[0m       🛠️  Install with development dependencies"
 	@echo "  \033[36msync\033[0m            ⚡ Fast dependency sync with uv"
 	@echo ""
-	@echo "\033[1mUsing Natest:\033[0m"
-	@echo "  \033[36mnatest\033[0m          🚀 Start the Natest framework"
+	@echo "\033[1mUsing Datest:\033[0m"
+	@echo "  \033[36mdatest\033[0m          🚀 Start the Datest framework"
 	@echo "  \033[36mtest\033[0m            🧪 Run all tests"
 	@echo ""
 	@echo "\033[1mCode Quality:\033[0m"
@@ -52,7 +52,7 @@ help: ## Show essential Natest commands
 
 help-more: ## Show all available commands including advanced ones
 	@echo ""
-	@echo "\033[1m\033[34mNatest Development Commands (Complete)\033[0m"
+	@echo "\033[1m\033[34mDatest Development Commands (Complete)\033[0m"
 	@echo "\033[1m===========================================\033[0m"
 	@echo ""
 	@echo "\033[1mGetting Started:\033[0m"
@@ -77,9 +77,9 @@ help-more: ## Show all available commands including advanced ones
 	@awk 'BEGIN {FS = ":.*?## "} /^(clean|docs-serve).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
-quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
+quickstart: ## 🚀 QUICK START: Get Datest running in 30 seconds!
 	@echo ""
-	@echo "🚀 \033[1m\033[32mNatest Quick Start\033[0m"
+	@echo "🚀 \033[1m\033[32mDatest Quick Start\033[0m"
 	@echo "===================="
 	@echo ""
 	@echo "📦 Installing dependencies..."
@@ -100,7 +100,7 @@ quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
 	@echo "🎉 \033[1m\033[32mReady to go!\033[0m"
 	@echo ""
 	@echo "\033[1mNext: Add your API key to .env, then:\033[0m"
-	@echo "  \033[36mmake natest\033[0m  # Start Natest framework"
+	@echo "  \033[36mmake datest\033[0m  # Start Datest framework"
 	@echo "  \033[36mmake test\033[0m    # Run tests"
 	@echo ""
 	@echo "\033[33m💡 Tip: Run 'open .env' to edit your API keys\033[0m"
@@ -171,9 +171,9 @@ install-llm: ## Install optional LLM integration for testing reason() calls
 # Usage
 # =============================================================================
 
-natest: ## Start the Natest framework
-	@echo "🚀 Starting Natest framework..."
-	natest
+datest: ## Start the Datest framework
+	@echo "🚀 Starting Datest framework..."
+	datest
 
 test: ## Run all tests
 	@echo "🧪 Running tests..."
@@ -255,7 +255,7 @@ test-fast: ## MORE: Run fast tests only
 
 test-cov: ## MORE: Run tests with coverage report
 	@echo "📊 Running tests with coverage..."
-	pytest --cov=natest --cov-report=html --cov-report=term tests/
+	pytest --cov=datest --cov-report=html --cov-report=term tests/
 	@echo "📈 Coverage report generated in htmlcov/"
 
 dev: setup-dev check test-fast ## MORE: Complete development setup and verification
@@ -263,7 +263,7 @@ dev: setup-dev check test-fast ## MORE: Complete development setup and verificat
 	@echo "🎉 \033[1m\033[32mDevelopment environment is ready!\033[0m"
 	@echo ""
 	@echo "Next steps:"
-	@echo "  • Run '\033[36mmake natest\033[0m' to start the Natest framework"
+	@echo "  • Run '\033[36mmake datest\033[0m' to start the Datest framework"
 	@echo "  • Run '\033[36mmake test\033[0m' to run tests"
 	@echo "  • Run '\033[36mmake check\033[0m' for code quality checks"
 	@echo ""
@@ -271,7 +271,7 @@ dev: setup-dev check test-fast ## MORE: Complete development setup and verificat
 security: ## MORE: Run security checks on codebase
 	@echo "🔒 Running security checks..."
 	@if command -v bandit >/dev/null 2>&1; then \
-		bandit -r natest/ || echo "⚠️  Security issues found"; \
+		bandit -r datest/ || echo "⚠️  Security issues found"; \
 	else \
 		echo "❌ bandit not available. Install with: pip install bandit"; \
 	fi
@@ -320,4 +320,4 @@ check-dist: ## Validate built distribution files
 publish: check-dist ## Upload to PyPI
 	@echo "🚀 Publishing to PyPI..."
 	twine upload --verbose dist/*
-run: natest ## Alias for 'natest' command
+run: datest ## Alias for 'datest' command

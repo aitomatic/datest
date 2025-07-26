@@ -1,4 +1,4 @@
-# Natest MVP - 3D Design Document
+# Datest MVP - 3D Design Document
 
 > **Design-Driven Development for Dana Testing Framework Integration**
 
@@ -47,12 +47,12 @@
 ### **Component Design**
 
 ```
-🧪 NATEST MVP ARCHITECTURE (Dana-Integrated)
+🧪 DATEST MVP ARCHITECTURE (Dana-Integrated)
 
 ┌─────────────────────────────────────────────────────────┐
 │                 🖥️  CLI LAYER                          │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
-│  │    natest   │  │   pytest   │  │     Dana        │ │
+│  │    datest   │  │   pytest   │  │     Dana        │ │
 │  │   command   │  │ integration │  │   Commands      │ │
 │  └─────────────┘  └─────────────┘  └─────────────────┘ │
 └─────────────┬───────────────────────────────┬─────────┘
@@ -130,15 +130,15 @@ def pytest_collect_file(path, parent):
 **Goal**: Basic Dana test discovery and execution
 
 #### **Implementation Tasks**
-- [ ] Create `natest/discovery.py` with basic `.na` file discovery
-- [ ] Create `natest/executor.py` that calls Dana runtime via subprocess
-- [ ] Create `natest/results.py` for basic result parsing
-- [ ] Update `natest/cli.py` to integrate components
+- [ ] Create `datest/discovery.py` with basic `.na` file discovery
+- [ ] Create `datest/executor.py` that calls Dana runtime via subprocess
+- [ ] Create `datest/results.py` for basic result parsing
+- [ ] Update `datest/cli.py` to integrate components
 - [ ] Create basic test fixtures in `tests/fixtures/`
 
 #### **Acceptance Criteria**
-- [ ] `natest tests/fixtures/` discovers test files
-- [ ] `natest tests/fixtures/simple_test.na` executes Dana file
+- [ ] `datest tests/fixtures/` discovers test files
+- [ ] `datest tests/fixtures/simple_test.na` executes Dana file
 - [ ] Basic pass/fail status reported to console
 - [ ] No crashes on valid `.na` files
 
@@ -146,7 +146,7 @@ def pytest_collect_file(path, parent):
 ```bash
 # Phase 1 Testing
 dana tests/fixtures/simple_test.na    # Manual verification
-natest tests/fixtures/               # Automated discovery
+datest tests/fixtures/               # Automated discovery
 uv run pytest tests/unit/test_discovery.py -v
 ```
 
@@ -156,7 +156,7 @@ uv run pytest tests/unit/test_discovery.py -v
 #### **Implementation Tasks**
 - [ ] Improve Dana runtime integration (direct import vs subprocess)
 - [ ] Add Dana-specific assertion parsing from output
-- [ ] Create `natest/assertions.py` for Dana test patterns
+- [ ] Create `datest/assertions.py` for Dana test patterns
 - [ ] Add structured result parsing (JSON output from Dana)
 - [ ] Enhance error handling and debugging
 
@@ -169,7 +169,7 @@ uv run pytest tests/unit/test_discovery.py -v
 #### **Test Strategy**
 ```bash
 # Phase 2 Testing
-natest --verbose tests/fixtures/      # Enhanced output
+datest --verbose tests/fixtures/      # Enhanced output
 dana --debug tests/fixtures/simple_test.na  # Verify Dana execution
 uv run pytest tests/integration/ -v   # End-to-end tests
 ```
@@ -178,10 +178,10 @@ uv run pytest tests/integration/ -v   # End-to-end tests
 **Goal**: pytest integration and production readiness
 
 #### **Implementation Tasks**
-- [ ] Create `natest/pytest_plugin.py` for pytest integration
+- [ ] Create `datest/pytest_plugin.py` for pytest integration
 - [ ] Add rich console output with colors and formatting
 - [ ] Implement proper exit codes (0=pass, 1=fail, 2=error)
-- [ ] Add configuration support (`natest.toml`)
+- [ ] Add configuration support (`datest.toml`)
 - [ ] Final testing and documentation
 
 #### **Acceptance Criteria**
@@ -194,7 +194,7 @@ uv run pytest tests/integration/ -v   # End-to-end tests
 ```bash
 # Phase 3 Testing
 pytest tests/ -v                     # Full integration test
-natest --help                        # CLI documentation
+datest --help                        # CLI documentation
 uv run pytest tests/ --verbose       # Complete test suite
 ```
 
@@ -204,7 +204,7 @@ uv run pytest tests/ --verbose       # Complete test suite
 
 ### **Core Data Structures**
 ```python
-# natest/models.py
+# datest/models.py
 
 @dataclass
 class DanaTestFile:
@@ -237,7 +237,7 @@ class DanaAssertion:
 
 ### **Dana Runtime Integration**
 ```python
-# natest/executor.py
+# datest/executor.py
 
 class DanaTestExecutor:
     def run_dana_file(self, file_path: Path) -> DanaTestResult:
@@ -257,7 +257,7 @@ class DanaTestExecutor:
 
 ### **pytest Integration**
 ```python
-# natest/pytest_plugin.py
+# datest/pytest_plugin.py
 
 def pytest_collect_file(path, parent):
     """Register .na files with pytest"""
@@ -275,15 +275,15 @@ class DanaTestFile(pytest.File):
 ## 🧪 Testing Strategy
 
 ### **Self-Testing Approach**
-- **Unit Tests**: Test natest components in isolation (`tests/unit/`)
+- **Unit Tests**: Test datest components in isolation (`tests/unit/`)
 - **Integration Tests**: Test Dana runtime integration (`tests/integration/`)
 - **Fixture Tests**: Known Dana test files with expected results (`tests/fixtures/`)
-- **End-to-End Tests**: Full natest execution pipeline (`tests/e2e/`)
+- **End-to-End Tests**: Full datest execution pipeline (`tests/e2e/`)
 
 ### **Test Files Structure**
 ```
 tests/
-├── unit/                    # Unit tests for natest components
+├── unit/                    # Unit tests for datest components
 │   ├── test_discovery.py    # Test file discovery
 │   ├── test_executor.py     # Test Dana execution bridge  
 │   └── test_results.py      # Test result parsing
@@ -303,7 +303,7 @@ tests/
 uv run ruff check . && uv run ruff format .  # Code quality
 uv run pytest tests/ -v                      # All tests
 dana tests/fixtures/simple_test.na           # Manual Dana execution
-natest tests/fixtures/                       # Manual natest execution
+datest tests/fixtures/                       # Manual datest execution
 ```
 
 ---
@@ -361,8 +361,8 @@ natest tests/fixtures/                       # Manual natest execution
 
 **Phase 1 Validation:**
 ```bash
-uv run natest --discover-only tests/fixtures/  # ✅ Discovers 3 files
-uv run natest -v tests/fixtures/               # ✅ Graceful Dana fallback
+uv run datest --discover-only tests/fixtures/  # ✅ Discovers 3 files
+uv run datest -v tests/fixtures/               # ✅ Graceful Dana fallback
 uv run pytest tests/unit/test_discovery.py -v  # ✅ 12/13 tests pass
 ```
 

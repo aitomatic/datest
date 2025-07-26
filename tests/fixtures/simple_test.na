@@ -1,5 +1,5 @@
 // test_simple.na - Basic Dana test file
-// This file tests basic Dana functionality for natest validation
+// This file tests basic Dana functionality for datest validation
 
 log("🧪 Starting simple Dana test")
 
