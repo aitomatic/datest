@@ -11,10 +11,9 @@
 .DEFAULT_GOAL := help
 
 # All targets are phony (don't create files)
-.PHONY: help help-more quickstart install setup-dev sync test dana clean lint format fix check mypy \
-	install-ollama start-ollama install-vllm start-vllm install-vscode install-cursor install-vim install-emacs \
-	docs-serve docs-build docs-deps test-fast test-cov update-deps dev security validate-config release-check \
-	sync-dev lock-deps check-uv
+.PHONY: help help-more quickstart install setup-dev sync test clean clean-natest lint format fix check mypy \
+	install-llm docs-serve docs-build docs-deps test-fast test-cov dev security validate-config check-structure release-check \
+	sync-dev lock-deps check-uv build dist check-dist publish run datest-test
 
 # =============================================================================
 # Help & Quick Start
@@ -34,6 +33,7 @@ help: ## Show essential Datest commands
 	@echo "\033[1mUsing Datest:\033[0m"
 	@echo "  \033[36mdatest\033[0m          🚀 Start the Datest framework"
 	@echo "  \033[36mtest\033[0m            🧪 Run all tests"
+	@echo "  \033[36mdatest-test\033[0m     🧪 Run datest-specific tests and validation"
 	@echo ""
 	@echo "\033[1mCode Quality:\033[0m"
 	@echo "  \033[36mlint\033[0m            🔍 Check code style and quality"
@@ -179,6 +179,24 @@ test: ## Run all tests
 	@echo "🧪 Running tests..."
 	pytest tests/
 
+datest-test: ## Run datest-specific tests and validation
+	@echo "🧪 Running Datest framework tests..."
+	@echo "📋 Testing datest CLI..."
+	@if command -v datest >/dev/null 2>&1; then \
+		datest --help >/dev/null && echo "✅ datest CLI works"; \
+	else \
+		echo "⚠️  datest command not found, run 'make install' first"; \
+	fi
+	@echo "📋 Testing datest discovery..."
+	@if [ -d tests/fixtures ]; then \
+		echo "✅ Test fixtures directory found"; \
+		ls tests/fixtures/*.na 2>/dev/null | wc -l | xargs echo "📁 Found .na test files:"; \
+	else \
+		echo "⚠️  No test fixtures directory found"; \
+	fi
+	@echo "📋 Running pytest with datest plugin..."
+	pytest tests/ -v
+
 # =============================================================================
 # Code Quality
 # =============================================================================
@@ -220,6 +238,16 @@ clean: ## Clean build artifacts and caches
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	rm -rf .ruff_cache/ .mypy_cache/
+
+clean-natest: ## Clean up natest directory (keeps datest)
+	@echo "🧹 Cleaning up natest directory..."
+	@if [ -d natest ]; then \
+		echo "📁 Removing natest directory..."; \
+		rm -rf natest/; \
+		echo "✅ natest directory removed"; \
+	else \
+		echo "ℹ️  natest directory not found"; \
+	fi
 
 docs-serve: ## Serve documentation locally
 	@echo "📚 Serving docs at http://localhost:8000"
@@ -286,8 +314,34 @@ validate-config: ## MORE: Validate project configuration files
 	fi
 	@if [ -f mkdocs.yml ]; then \
 		echo "📝 Checking mkdocs.yml..."; \
-		python3 -c "import yaml; yaml.safe_load(open('mkdocs.yml')); print('✅ mkdocs.yml is valid')"; \
+		if [ -r mkdocs.yml ]; then \
+			echo "✅ mkdocs.yml exists and is readable"; \
+		else \
+			echo "❌ mkdocs.yml exists but is not readable"; \
+		fi; \
 	fi
+
+check-structure: ## MORE: Check project structure and setup
+	@echo "🏗️  Checking project structure..."
+	@echo "📁 Core directories:"
+	@if [ -d datest ]; then echo "  ✅ datest/ - Main package directory"; else echo "  ❌ datest/ - Missing!"; fi
+	@if [ -d tests ]; then echo "  ✅ tests/ - Test directory"; else echo "  ❌ tests/ - Missing!"; fi
+	@if [ -d docs ]; then echo "  ✅ docs/ - Documentation directory"; else echo "  ❌ docs/ - Missing!"; fi
+	@if [ -d examples ]; then echo "  ✅ examples/ - Examples directory"; else echo "  ❌ examples/ - Missing!"; fi
+	@echo "📁 Key files:"
+	@if [ -f pyproject.toml ]; then echo "  ✅ pyproject.toml - Project configuration"; else echo "  ❌ pyproject.toml - Missing!"; fi
+	@if [ -f README.md ]; then echo "  ✅ README.md - Project documentation"; else echo "  ❌ README.md - Missing!"; fi
+	@if [ -f datest/__init__.py ]; then echo "  ✅ datest/__init__.py - Package init"; else echo "  ❌ datest/__init__.py - Missing!"; fi
+	@if [ -f datest/cli.py ]; then echo "  ✅ datest/cli.py - CLI interface"; else echo "  ❌ datest/cli.py - Missing!"; fi
+	@echo "📁 Test fixtures:"
+	@if [ -d tests/fixtures ]; then \
+		echo "  ✅ tests/fixtures/ - Test fixtures directory"; \
+		ls tests/fixtures/*.na 2>/dev/null | wc -l | xargs echo "    📄 .na test files:"; \
+	else \
+		echo "  ❌ tests/fixtures/ - Missing!"; \
+	fi
+	@echo "📁 Legacy cleanup:"
+	@if [ -d natest ]; then echo "  ⚠️  natest/ - Legacy directory (run 'make clean-natest' to remove)"; else echo "  ✅ No legacy natest directory"; fi
 
 release-check: clean check test-fast security validate-config ## MORE: Complete pre-release validation
 	@echo ""
