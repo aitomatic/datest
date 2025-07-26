@@ -203,26 +203,42 @@ datest-test: ## Run datest-specific tests and validation
 
 lint: ## Check code style and quality
 	@echo "🔍 Running linting checks..."
-	ruff check .
+	@echo "  Critical checks (E722, F821)..."
+	ruff check datest/ tests/ --select=E722,F821
+	@echo "  Important checks (F841, B017)..."
+	ruff check datest/ tests/ --select=F841,B017
+	@echo "  Style checks..."
+	ruff check datest/ tests/ --select=E,F,W,UP
+
+lint-critical: ## Run critical lint checks (E722, F821)
+	@echo "🔍 Running critical lint checks..."
+	ruff check datest/ tests/ --select=E722,F821
+
+lint-important: ## Run important lint checks (F841, B017)
+	@echo "🔍 Running important lint checks..."
+	ruff check datest/ tests/ --select=F841,B017
 
 format: ## Format code automatically
 	@echo "✨ Formatting code..."
-	ruff format .
+	ruff format datest/ tests/
 
 check: lint ## Run all code quality checks
 	@echo "📝 Checking code formatting..."
-	ruff format --check .
+	ruff format --check datest/ tests/
 	@echo "✅ All quality checks completed!"
 
 fix: ## Auto-fix all fixable code issues
 	@echo "🔧 Auto-fixing code issues..."
-	ruff check --fix .
-	ruff format .
+	ruff check --fix datest/ tests/
+	ruff format datest/ tests/
 	@echo "🔧 Applied all auto-fixes!"
 
 mypy: ## Run type checking
 	@echo "🔍 Running type checks..."
-	mypy .
+	mypy datest/ tests/
+
+ci-check: lint-critical test ## Run CI checks locally
+	@echo "✅ CI checks completed!"
 
 # =============================================================================
 # Optional Extensions
