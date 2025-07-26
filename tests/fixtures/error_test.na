@@ -1,0 +1,15 @@
+// test_error.na - Dana test file with syntax errors
+// This file tests natest's ability to handle Dana syntax errors
+
+log("🧪 Starting error Dana test")
+
+// Valid statement
+x = 10
+log(f"Valid assignment: x = {x}")
+
+// Syntax error - undefined variable
+y = undefined_variable  // This should cause an error
+
+// More valid statements that shouldn't be reached due to error
+z = x + y
+log(f"This should not be reached: z = {z}") 

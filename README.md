@@ -1,123 +1,241 @@
-# OpenSSM – “Small Specialist Models”
+# Natest 🧪
 
-## for Industrial AI and AI Independence
+> **Simple testing framework for Dana language files (.na)**
 
-> &nbsp;
-> See full documentation at [aitomatic.github.io/openssm/](https://aitomatic.github.io/openssm/).
-> &nbsp;
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
-OpenSSM (pronounced `open-ess-ess-em`) is an open-source framework for Small Specialist Models (SSMs), which are key to enhancing trust, reliability, and safety in Industrial-AI applications.  Harnessing the power of domain expertise, SSMs operate either alone or in "teams". They collaborate with other SSMs, planners, and sensors/actuators to deliver real-world problem-solving capabilities.
+Natest is a minimal testing framework for Dana (.na) files. It provides basic test discovery and execution for neurosymbolic agent systems written in the Dana language.
 
-Unlike Large Language Models (LLMs), which are computationally intensive and generalized, SSMs are lean, efficient, and designed specifically for individual domains. This focus makes them an optimal choice for businesses, SMEs, researchers, and developers seeking specialized and robust AI solutions for industrial applications.
+**Status: Early MVP** - Basic functionality for discovering and validating Dana test files.
 
-![SSM in Industrial AI](docs/diagrams/ssm-industrial-use-case.drawio.png)
+---
 
-A prime deployment scenario for SSMs is within the aiCALM (Collaborative Augmented Large Models) architecture. aiCALM represents a cohesive assembly of AI components tailored for sophisticated problem-solving capabilities. Within this framework, SSMs work with General Management Models (GMMs) and other components to solve complex, domain-specific, and industrial problems.
+## 🚀 Quick Start
 
-## Why SSM?
+```bash
+# Install and setup
+git clone https://github.com/aitomatic/natest.git
+cd natest
+make quickstart
 
-The trend towards specialization in AI models is a clear trajectory seen by many in the field.
+# Run natest (currently shows help and validates setup)
+natest
 
-<!-- markdownlint-disable MD028 -->
-> &nbsp;
-> _Specialization is crucial for quality .. not general purpose Al models_ – Eric Schmidt, Schmidt Foundation
-> &nbsp;
+# Future: Basic Dana file testing
+natest test_example.na           # Run a Dana test file
+natest tests/                    # Run all .na files in directory
+```
 
-> &nbsp;
-> _.. small models .. for a specific task that are good_ –  Matei Zaharia, Databricks
-> &nbsp;
+---
 
-> &nbsp;
-> _.. small agents working together .. specific and best in their tasks_ – Harrison Chase, Langchain
-> &nbsp;
+## 🧪 What Natest Does
 
-> &nbsp;
-> _.. small but highly capable expert models_ – Andrej Karpathy, OpenAI
-> &nbsp;
+Natest is a **barebones MVP** that focuses on the essentials:
 
-> &nbsp;
-> _.. small models are .. a massive paradigm shift .. about deploying AI models at scale_ – Rob Toews, Radical Ventures
-> &nbsp;
-<!-- markdownlint-enable MD028 -->
+### **Basic Test Discovery**
+- Finds `.na` files in directories
+- Follows simple naming patterns (`test_*.na`)
+- Basic file validation
 
-As predicted by Eric Schmidt and others, we will see “a rich ecosystem to emerge [of] high-value, specialized AI systems.” SSMs are the central part in the architecture of these systems.
+### **Simple Dana Test Format**
+```dana
+// test_example.na - Basic Dana test
+test "simple reasoning" {
+    reason("What is 2 + 2?")
+    expect(contains("4"))
+}
 
-## What OpenSSM Offers
+test "basic memory" {
+    remember("fact", "sky is blue")
+    reason("What color is the sky?")
+    expect(contains("blue"))
+}
+```
 
-OpenSSM fills this gap directly, with the following benefits to the community, developers, and businesses:
+---
 
-- **Industrial Focus:** SSMs are developed with a specific emphasis on industrial applications, addressing the unique requirements of trustworthiness, safety, reliability, and scalability inherent to this sector.
+## ✨ Core Features (MVP)
 
-- **Fast, Cost-Effective & Easy to Use:** SSMs are 100-1000x faster and more efficient than LLMs, making them accessible and cost-effective particularly for industrial usage where time and resources are critical factors.
+- **🔍 File Discovery**: Finds Dana test files in directories
+- **📄 Basic Parsing**: Validates Dana test file syntax 
+- **📋 Simple Output**: Basic pass/fail reporting
+- **🎯 Minimal**: Focused on essential functionality only
 
-- **Easy Knowledge Capture:** OpenSSM has easy-to-use tools for capturing domain knowledge in diverse forms: books, operaring manuals, databases, knowledge graphs, text files, and code.
+**Not Included (Yet):**
+- ❌ Advanced assertions
+- ❌ Parallel execution  
+- ❌ Complex reporting
+- ❌ Plugin system
+- ❌ Coverage analysis
 
-- **Powerful Operations on Captured Knowledge:** OpenSSM enables both knowledge query and inferencing/predictive capabilities based on the domain-specific knowledge.
+---
 
-- **Collaborative Problem-Solving**: SSMs are designed to work in problem-solving "teams". Multi-SSM collaboration is a first-class design feature, not an afterthought.
+## 🛠️ Installation
 
-- **Reliable Domain Expertise:** Each SSM has expertise in a particular field or equipment, offering precise and specialized knowledge, thereby enhancing trustworthiness, reliability, and safety for Industrial-AI applications. With self-reasoning, causal reasoning, and retrieval-based knowledge, SSMs provide a trustable source of domain expertise.
+```bash
+# Quick setup
+git clone https://github.com/aitomatic/natest.git
+cd natest
+make setup-dev
+```
 
-- **Vendor Independence:** OpenSSM allows everyone to build, train, and deploy their own domain-expert AI models, offering freedom from vendor lock-in and security concerns.
+Or install directly:
+```bash
+pip install -e .
+```
 
-- **Composable Expertise**: SSMs are fully composable, making it easy to combine domain expertise.
+---
 
-## Target Audience
+## 📖 Basic Usage
 
-Our primary audience includes:
+### **Current Commands**
+```bash
+# Show help and validate installation
+natest
 
-- **Businesses and SMEs** wishing to leverage AI in their specific industrial context without relying on extensive computational resources or large vendor solutions.
+# Check version
+natest --version
 
-- **AI researchers and developers** keen on creating more efficient, robust, and domain-specific AI models for industrial applications.
+# Verbose output
+natest --verbose
+```
 
-- **Open-source contributors** believing in democratizing industrial AI and eager to contribute to a community-driven project focused on building and sharing specialized AI models.
+### **Planned Commands (Simple)**
+```bash
+# Run Dana test files
+natest test_example.na           # Single file
+natest tests/                    # Directory of .na files
+natest --list                    # Show discovered tests
+```
 
-- **Industries** with specific domain problems that can be tackled more effectively by a specialist AI model, enhancing the reliability and trustworthiness of AI solutions in an industrial setting.
+---
 
-## SSM Architecture
+## 🧪 Writing Dana Tests (Basic)
 
-At a high level, SSMs comprise a front-end Small Language Model (SLM), an adapter layer in the middle, and a wide range of back-end domain-knowledge sources. The SLM itself is a small, efficient, language model, which may be domain-specific or not, and may have been distilled from a larger model. Thus, domain knowledge may come from either, or both, the SLM and the backends.
+### **Simple Test Structure**
+```dana
+// test_basic.na
+test "addition" {
+    reason("What is 5 + 3?")
+    expect(contains("8"))
+}
 
-![High-Level SSM Architecture](docs/diagrams/ssm-key-components.drawio.png)
+test "memory recall" {
+    remember("name", "Alice")
+    reason("What name did I remember?")
+    expect(contains("Alice"))
+}
+```
 
-The above diagram illustrates the high-level architecture of an SSM, which comprises three main components:
+### **Basic Assertions (Planned)**
+- `expect(contains("text"))` - Check if response contains text
+- `expect(equals("exact"))` - Exact match
+- `expect(not_empty())` - Response is not empty
 
-1. Small Language Model (SLM): This forms the communication frontend of an SSM.
+**That's it.** No complex patterns, no advanced features - just the basics.
 
-2. Adapters (e.g., LlamaIndex): These provide the interface between the SLM and the domain-knowledge backends.
+---
 
-3. Domain-Knowledge Backends: These include text files, documents, PDFs, databases, code, knowledge graphs, models, other SSMs, etc.
+## 🏗️ Current Status
 
-SSMs communicate in both unstructured (natural language) and structured APIs, catering to a variety of real-world industrial systems.
+### **What Works Now (v0.1.0)**
+- ✅ CLI framework with basic argument parsing
+- ✅ Project structure and packaging
+- ✅ Development tooling setup
+- ✅ Installation and basic validation
 
-![SSM Composability](docs/diagrams/ssm-composability.drawio.png)
+### **Next Steps (v0.2.0)**
+- 🚧 Simple Dana file discovery
+- 🚧 Basic Dana test parsing
+- 🚧 Minimal test execution
+- 🚧 Simple pass/fail output
 
-The composable nature of SSMs allows for easy combination of domain-knowledge sources from multiple models.
+### **Future (Maybe)**
+- 📋 More assertion types
+- 📋 Better error messages
+- 📋 Configuration files
+- 📋 Integration with other tools
 
-## Getting Started
+---
 
-See our [Getting Started Guide](docs/GETTING_STARTED.md) for more information.
+## 🔧 Configuration (Minimal)
 
-## Roadmap
+### **Basic natest.toml**
+```toml
+# natest.toml - Simple configuration
+[tool.natest]
+test_dirs = ["tests"]
+test_pattern = "test_*.na"
+```
 
-- Play with SSMs in a hosted SSM sandbox, uploading your own domain knowledge
+That's all the configuration needed for the MVP.
 
-- Create SSMs in your own development environment, and integrate SSMs into your own AI apps
+---
 
-- Capture domain knowledge in various forms into your SSMs
+## 🤝 Contributing
 
-- Train SLMs via distillation of LLMs, teacher/student approaches, etc.
+This is a minimal MVP, so contributions should focus on:
 
-- Apply SSMs in collaborative problem-solving AI systems
+### **Core Priorities**
+1. **Dana file parsing** - Basic syntax validation
+2. **Test discovery** - Find .na files reliably  
+3. **Simple execution** - Run tests and report results
+4. **Error handling** - Clear error messages
 
-## Community
+### **Non-Priorities (For Now)**
+- Advanced features
+- Complex reporting
+- Performance optimization
+- Plugin systems
 
-Join our vibrant community of AI enthusiasts, researchers, developers, and businesses who are democratizing industrial AI through SSMs.  Participate in the discussions, share your ideas, or ask for help on our [Community Discussions](https://github.com/aitomatic/openssm/discussions).
+### **Getting Started**
+```bash
+git clone https://github.com/your-username/natest.git
+cd natest
+make setup-dev
+make test
+```
 
-## Contribute
+---
 
-OpenSSM is a community-driven initiative, and we warmly welcome contributions. Whether it's enhancing existing models, creating new SSMs for different industrial domains, or improving our documentation, every contribution counts. See our [Contribution Guide](docs/community/CONTRIBUTING.md) for more details.
+## 📊 Why This MVP Approach?
 
-## License
+### **Keep It Simple**
+- Focus on core Dana testing needs
+- Get basic functionality working first
+- Avoid feature creep early on
 
-OpenSSM is released under the [Apache 2.0 License](docs/LICENSE.md).
+### **Learn First**
+- Understand how Dana tests should work
+- Get feedback from real usage
+- Build features that are actually needed
+
+### **Sustainable Development**
+- Small, manageable codebase
+- Clear scope and expectations
+- Room to grow based on user needs
+
+---
+
+## 🔗 Resources
+
+- **Repository**: [github.com/aitomatic/natest](https://github.com/aitomatic/natest)
+- **Issues**: [Report bugs and simple feature requests](https://github.com/aitomatic/natest/issues)
+- **Discussions**: [Basic usage questions](https://github.com/aitomatic/natest/discussions)
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE.md](LICENSE.md) for details.
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ by <a href="https://aitomatic.com">Aitomatic</a></strong>
+  <br/>
+  <em>Simple Dana testing, one step at a time</em>
+</p>
+

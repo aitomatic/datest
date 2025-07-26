@@ -1,0 +1,52 @@
+# .pre-commit-config.yaml - Natest Pre-commit Hooks Configuration
+# Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
+
+default_install_hook_types:
+  - pre-commit
+  - post-checkout
+  - post-merge
+  - post-rewrite
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # - id: trailing-whitespace
+      #   exclude: ^natest/dana/runtime/executor/(expression_evaluator|context_manager|statement_executor)\.py$
+      # - id: end-of-file-fixer
+      #   exclude: ^natest/dana/runtime/executor/(expression_evaluator|context_manager|statement_executor)\.py$
+      - id: check-yaml
+        exclude: ^mkdocs\.yml$
+      - id: check-added-large-files
+      # - id: check-ast
+      - id: check-json
+        exclude: ^natest/dana/runtime/executor/expression_evaluator\.py$|\.ipynb$|\.vscode/settings\.json$
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        args: [--fix, --config=pyproject.toml]
+      - id: ruff-format
+        args: [--config=pyproject.toml]
+
+  - repo: local
+    hooks:
+      - id: make-files-readonly
+        name: Make files read-only
+        entry: sh -c 'git ls-files examples/tutorials/** | xargs -r chmod -w'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [post-checkout, post-merge, post-rewrite]
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.7.9
+    hooks:
+      # Sync dependencies on checkout/merge/rebase
+      - id: uv-sync
+        stages: [post-checkout, post-merge, post-rewrite]
+        args: [--all-extras]

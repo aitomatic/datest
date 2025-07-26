@@ -1,39 +1,268 @@
-[tool.poetry]
-authors = ["Aitomatic Engineering <engineering@aitomatic.com>"]
-description = "OpenSSM - 'Small Specialist Models' for Industrial AI"
-name = "openssm"
-packages = [
-  {include = "openssm"},
-]
-readme = "README.md"
-version = "0.1.6"
+# pyproject.toml - Natest Project Configuration
+# Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
+
+# =============================================================================
+# Build System Configuration
+# =============================================================================
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.dependencies]
-python = ">=3.8.1,<4.0"
-python-dotenv = ">=0.19.0"
-pydantic = ">=1.10"
-openai = ">=0.27"
-# LlamaIndex & related
-llama-hub = ">=0.0.25"
-llama-index = ">=0.8.8"
-nltk = ">=3.8.1"  # used by LlamaIndex / LlamaHub plugins during indexing
-docx2txt = ">=0.8"  # for reading .docx files
-pypdf = ">=3.15.2"  # for reading .pdf files
-pycryptodome = ">=3.18.0"  # for reading .pdf files: PyCryptodome is required for AES algorithm
-# misc / other
-pytest = ">=7.0.0"
-google-api-python-client = ">=2.0"
+# =============================================================================
+# Project Metadata
+# =============================================================================
 
+[project]
+name = "natest"
+version = "0.1.0"
+description = "Natest: Pytest-inspired testing framework for Dana, the agent-first neurosymbolic language"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Christopher Nguyen", email = "ctn@aitomatic.com"},
+]
+keywords = ["testing", "dana", "neurosymbolic", "agent", "framework"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# Core dependencies with explicit version constraints
+dependencies = [
+    # Core testing framework
+    "pytest>=8.0.0,<9.0.0",
+    "pytest-asyncio>=0.24.0,<1.0.0",
+    
+    # Language processing for .na files
+    "lark>=1.2.0,<2.0.0",
+    
+    # Configuration and utilities
+    "python-dotenv>=1.0.0,<2.0.0",
+    "pyyaml>=6.0.0,<7.0.0",
+    
+    # CLI and output formatting
+    "click>=8.1.0,<9.0.0",
+    "rich>=13.7.0,<15.0.0",
+]
+
+# Optional dependency groups with explicit constraints
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8.0,<1.0.0",
+    "mypy>=1.8.0,<2.0.0",
+    "pre-commit>=4.0.0,<5.0.0",
+    "pytest-cov>=6.0.0,<7.0.0",
+    "build>=1.0.0,<2.0.0",
+    "twine>=6.0.0,<7.0.0",
+    "uv>=0.5.0",  # Ensure uv is available in dev
+]
+
+llm = [
+    # LLM integration for testing reason() calls
+    "openai>=1.54.0,<2.0.0",
+    "httpx>=0.28.0,<1.0.0",
+]
+
+docs = [
+    # Documentation tools
+    "mkdocs>=1.6.0,<2.0.0",
+    "mkdocs-material>=9.5.0,<10.0.0",
+]
+
+test = [
+    "pytest>=8.0.0,<9.0.0",
+    "pytest-asyncio>=0.24.0,<1.0.0",
+    "pytest-cov>=6.0.0,<7.0.0",
+    "pytest-xdist>=3.6.0,<4.0.0",  # Parallel test execution
+]
+
+all = ["natest[dev,llm,docs,test]"]
+
+# Command-line entry points
+[project.scripts]
+natest = "natest.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/aitomatic/natest"
+Documentation = "https://natest.readthedocs.io/"
+Repository = "https://github.com/aitomatic/natest.git"
+Issues = "https://github.com/aitomatic/natest/issues"
+Changelog = "https://github.com/aitomatic/natest/blob/main/CHANGELOG.md"
+
+# =============================================================================
+# UV Configuration
+# =============================================================================
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.8.0,<1.0.0",
+    "mypy>=1.8.0,<2.0.0",
+    "pre-commit>=4.0.0,<5.0.0",
+    "pytest-cov>=6.0.0,<7.0.0",
+    "build>=1.0.0,<2.0.0",
+    "twine>=6.0.0,<7.0.0",
+]
+
+# UV workspace configuration (if using workspaces)
+[tool.uv.workspace]
+members = ["."]
+
+# UV sources for dependency resolution
+[tool.uv.sources]
+# Add any custom package sources here if needed
+
+# =============================================================================
+# Package Configuration (Hatch)
+# =============================================================================
+
+[tool.hatch.build.targets.wheel]
+packages = ["natest"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/docs",
+    "/tests",
+    "/examples",
+    "/.vscode",
+    "/.idea",
+    "/tmp",
+]
+
+[tool.hatch.version]
+path = "natest/__init__.py"
+
+# =============================================================================
+# Code Quality Tools
+# =============================================================================
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["natest", "tests"]
+exclude = [
+    "*.na",           # Dana language files
+    ".git",           # Version control
+    ".venv",          # Virtual environment
+    ".uv-cache",      # UV cache
+    "build",          # Build artifacts
+    "dist",           # Distribution files
+    "*.egg-info",     # Build artifacts
+    "bin/",           # Utility scripts
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM", "TCH"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["SIM118"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["natest"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+warn_unreachable = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+
+# Paths to check
+files = ["natest", "tests"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "lark.*",
+    "rich.*",
+]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "test_*.na"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 addopts = [
-  "--import-mode=importlib",
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+    "--cov=natest",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
 ]
 filterwarnings = [
-  "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
-  "ignore:Deprecated call to `pkg_resources.declare_namespace.*google.*:DeprecationWarning",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
 ]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# =============================================================================
+# Coverage Configuration
+# =============================================================================
+
+[tool.coverage.run]
+source = ["natest"]
+branch = true
+omit = [
+    "natest/__main__.py",
+    "tests/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"
