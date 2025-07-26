@@ -74,6 +74,17 @@ test "basic memory" {
 
 ## 🛠️ Installation
 
+### **From PyPI (Recommended)**
+```bash
+# Install the latest release
+pip install datest
+
+# Or with optional dependencies
+pip install "datest[llm]"  # Include LLM integration
+pip install "datest[dev]"  # Include development tools
+```
+
+### **From Source**
 ```bash
 # Quick setup
 git clone https://github.com/aitomatic/datest.git
