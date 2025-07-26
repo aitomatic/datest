@@ -89,7 +89,7 @@ test = [
     "pytest-xdist>=3.6.0,<4.0.0",  # Parallel test execution
 ]
 
-all = ["datest[dev,llm,docs,test]"]
+
 
 # Command-line entry points
 [project.scripts]
