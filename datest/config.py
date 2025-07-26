@@ -43,7 +43,7 @@ class DatestConfig:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "DatestConfig":
-        print(f"DEBUG from_dict data: {data}")  # DEBUG
+        """Create config from dictionary"""
         config = cls()
 
         # Test discovery settings
