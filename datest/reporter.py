@@ -9,10 +9,11 @@ import sys
 from typing import TextIO
 
 from rich.console import Console
+from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from .executor import DanaTestResult
+from .models import DanaTestResult
 
 logger = logging.getLogger(__name__)
 
@@ -75,27 +76,47 @@ class DanaTestReporter:
 
     def _print_detailed_output(self, result: DanaTestResult) -> None:
         """Print detailed test output"""
-        if result.output:
-            # Print Dana output (log statements, etc.)
-            output_lines = result.output.strip().split("\n")
-            for line in output_lines:
-                if line.strip():
-                    self.console.print(f"    {line}", style="dim")
-
-        if result.errors:
-            # Print errors in red
-            error_lines = result.errors.strip().split("\n")
-            for line in error_lines:
-                if line.strip():
-                    self.console.print(f"    Error: {line}", style="red")
-
-        # Print assertion results if any
-        if result.assertions:
-            for assertion in result.assertions:
-                if assertion["type"] == "pass":
-                    self.console.print(f"    ✅ {assertion['message']}", style="green")
-                elif assertion["type"] == "fail":
-                    self.console.print(f"    ❌ {assertion['message']}", style="red")
+        # Group assertions by type
+        logs = [a for a in result.assertions if a.assertion_type == "log"]
+        asserts = [a for a in result.assertions if a.assertion_type == "assert"]
+        errors = [a for a in result.assertions if a.assertion_type == "error"]
+        
+        # Print log statements
+        if logs:
+            self.console.print("\n    📝 Log Output:", style="bold dim")
+            for log in logs:
+                self.console.print(f"      {log.message}", style="dim")
+        
+        # Print assertions
+        if asserts:
+            self.console.print("\n    🧪 Assertions:", style="bold")
+            for assertion in asserts:
+                if assertion.passed:
+                    self.console.print(f"      ✅ Line {assertion.line_number}: {assertion.message}", style="green")
+                else:
+                    self.console.print(f"      ❌ Line {assertion.line_number}: {assertion.message}", style="red")
+        
+        # Print errors
+        if errors or result.errors:
+            self.console.print("\n    ⚠️  Errors:", style="bold red")
+            for error in errors:
+                self.console.print(f"      {error.message}", style="red")
+            
+            # Also print raw error output if different
+            if result.errors and not errors:
+                error_lines = result.errors.strip().split("\n")
+                for line in error_lines:
+                    if line.strip():
+                        self.console.print(f"      {line}", style="red")
+        
+        # If verbose and no parsed assertions, show raw output
+        if self.verbose and not result.assertions and (result.output or result.errors):
+            self.console.print("\n    📄 Raw Output:", style="bold dim")
+            if result.output:
+                output_lines = result.output.strip().split("\n")
+                for line in output_lines:
+                    if line.strip():
+                        self.console.print(f"      {line}", style="dim")
 
     def _print_summary(self, results: list[DanaTestResult]) -> None:
         """Print test summary"""

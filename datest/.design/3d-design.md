@@ -366,19 +366,40 @@ uv run datest -v tests/fixtures/               # ✅ Graceful Dana fallback
 uv run pytest tests/unit/test_discovery.py -v  # ✅ 12/13 tests pass
 ```
 
-### **Phase 2: Dana Integration** ⏳ **READY TO START**
-- [ ] Enhanced Dana runtime integration
-- [ ] Dana assertion and log parsing
-- [ ] Structured result handling
-- [ ] Error handling and debugging
-- [ ] Rich output formatting
+### **Phase 2: Dana Integration** ✅ **COMPLETE**
+- [x] Enhanced Dana runtime integration
+- [x] Dana assertion and log parsing
+- [x] Structured result handling
+- [x] Error handling and debugging
+- [x] Rich output formatting
 
-### **Phase 3: Polish & Integration** ⏳
-- [ ] pytest plugin implementation
-- [ ] Rich console output with colors
-- [ ] Configuration file support
-- [ ] Proper exit codes and error handling
-- [ ] Final testing and documentation
+**Phase 2 Results:**
+- ✅ Created models.py with DanaTestFile, DanaAssertion, DanaTestResult dataclasses
+- ✅ Created assertions.py with DanaAssertionParser for parsing Dana output
+- ✅ Enhanced executor.py to use new models and assertion parser
+- ✅ Updated reporter.py to display parsed assertions and enhanced output
+- ✅ Added JSON output support (--output-json flag)
+- ✅ Created comprehensive unit tests for models, assertions, and executor
+- ✅ Created integration tests for full pipeline testing
+- ✅ Improved error handling with proper exit codes
+
+### **Phase 3: Polish & Integration** ✅ **COMPLETE**
+- [x] pytest plugin implementation
+- [x] Rich console output with colors
+- [x] Configuration file support
+- [x] Proper exit codes and error handling
+- [x] Final testing and documentation
+
+**Phase 3 Results:**
+- ✅ Created pytest_plugin.py with full pytest integration
+- ✅ Added pytest hooks for .na file discovery and execution
+- ✅ Created config.py with DatestConfig for configuration management
+- ✅ Support for datest.toml and pyproject.toml configuration files
+- ✅ Enhanced CLI with configuration support and new options
+- ✅ Added proper exit codes (0=success, 1=test failure, 2=error)
+- ✅ Created comprehensive unit tests for configuration
+- ✅ Created end-to-end tests for full pipeline testing
+- ✅ Updated pyproject.toml with pytest plugin registration
 
 ---
 

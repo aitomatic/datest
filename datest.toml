@@ -1,0 +1,31 @@
+# datest.toml - Configuration for Dana test framework
+
+[discovery]
+# Patterns for test file discovery
+patterns = ["test_*.na", "*_test.na"]
+# Patterns to exclude from discovery
+exclude = [".*", "__pycache__", "*.egg-info", "bin/"]
+# Recursively search directories
+recursive = true
+# Maximum directory depth for recursive search
+max_depth = 10
+
+[execution]
+# Path to Dana command
+command = "dana"
+# Timeout for test execution (seconds)
+timeout = 30.0
+# Use JSON output format
+json_output = false
+
+[output]
+# Verbose output
+verbose = false
+# Use colored output
+color = true
+# Show test execution timings
+timings = true
+
+[pytest]
+# Enable pytest plugin for .na files
+enable = true

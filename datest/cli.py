@@ -11,6 +11,7 @@ from pathlib import Path
 
 import click
 
+from .config import DatestConfig
 from .discovery import DanaTestDiscovery, DiscoveryConfig
 from .executor import DanaTestExecutor
 from .reporter import DanaTestReporter
@@ -29,9 +30,20 @@ logger = logging.getLogger(__name__)
     "--pattern", "-p", multiple=True, help="Test file patterns (default: test_*.na, *_test.na)"
 )
 @click.option("--discover-only", is_flag=True, help="Only discover test files, don't execute them")
+@click.option("--config", "-c", type=click.Path(exists=True), help="Path to configuration file")
+@click.option("--json", is_flag=True, help="Use JSON output format for Dana tests")
+@click.option("--timeout", "-t", type=float, help="Timeout for test execution in seconds")
+@click.option("--no-color", is_flag=True, help="Disable colored output")
 @click.argument("test_paths", nargs=-1, type=click.Path(exists=True))
 def main(
-    verbose: bool, pattern: tuple[str, ...], discover_only: bool, test_paths: tuple[str, ...]
+    verbose: bool, 
+    pattern: tuple[str, ...], 
+    discover_only: bool, 
+    config: str | None,
+    json: bool,
+    timeout: float | None,
+    no_color: bool,
+    test_paths: tuple[str, ...]
 ) -> None:
     """
     Datest: Testing framework for Dana language files.
@@ -44,13 +56,33 @@ def main(
         datest --discover-only tests/    # Only show discovered files
         datest -v tests/                 # Verbose output
     """
-    # Configure logging level
+    # Load configuration
+    if config:
+        config_path = Path(config)
+        datest_config = DatestConfig.load_from_file(config_path)
+    else:
+        datest_config = DatestConfig.find_and_load()
+    
+    # Apply command line overrides
     if verbose:
+        datest_config.verbose = True
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger("datest").setLevel(logging.DEBUG)
+    
+    if json:
+        datest_config.use_json_output = True
+    
+    if timeout is not None:
+        datest_config.timeout = timeout
+    
+    if no_color:
+        datest_config.use_color = False
 
     # Initialize components
-    reporter = DanaTestReporter(use_color=True, verbose=verbose)
+    reporter = DanaTestReporter(
+        use_color=datest_config.use_color, 
+        verbose=datest_config.verbose
+    )
 
     # Show header
     click.echo("🧪 Datest - Testing framework for Dana language")
@@ -66,11 +98,14 @@ def main(
         paths = [Path(p) for p in test_paths]
 
     # Configure discovery
-    config = DiscoveryConfig()
-    if pattern:
-        config.patterns = list(pattern)
+    discovery_config = DiscoveryConfig(
+        patterns=datest_config.test_patterns if not pattern else list(pattern),
+        exclude_patterns=datest_config.exclude_patterns,
+        recursive=datest_config.recursive,
+        max_depth=datest_config.max_depth
+    )
 
-    discovery = DanaTestDiscovery(config)
+    discovery = DanaTestDiscovery(discovery_config)
 
     try:
         # Discover test files
@@ -91,7 +126,12 @@ def main(
             sys.exit(0)
 
         # Execute tests
-        executor = DanaTestExecutor()
+        executor_config = {
+            "dana_command": datest_config.dana_command,
+            "timeout": datest_config.timeout,
+            "use_json_output": datest_config.use_json_output,
+        }
+        executor = DanaTestExecutor(executor_config)
 
         # Check if Dana is available
         if not executor.is_dana_available():

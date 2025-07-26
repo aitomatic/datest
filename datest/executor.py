@@ -8,45 +8,12 @@ import logging
 import subprocess
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
+
+from .assertions import DanaAssertionParser
+from .models import DanaTestResult
 
 logger = logging.getLogger(__name__)
-
-
-class DanaTestResult:
-    """Result of running a Dana test file"""
-
-    def __init__(
-        self,
-        file_path: Path,
-        success: bool,
-        duration: float,
-        output: str = "",
-        errors: str = "",
-        exit_code: int = 0,
-    ):
-        self.file_path = file_path
-        self.success = success
-        self.duration = duration
-        self.output = output
-        self.errors = errors
-        self.exit_code = exit_code
-        self.assertions = self._parse_assertions()
-
-    def _parse_assertions(self) -> list:
-        """Parse assertions from Dana output (basic implementation)"""
-        # For Phase 1: basic parsing of log statements and errors
-        assertions = []
-
-        # Look for common assertion patterns in output
-        lines = self.output.split("\n")
-        for i, line in enumerate(lines):
-            if "✅" in line:
-                assertions.append({"line": i + 1, "type": "pass", "message": line.strip()})
-            elif "❌" in line or "Error:" in line:
-                assertions.append({"line": i + 1, "type": "fail", "message": line.strip()})
-
-        return assertions
 
 
 class DanaTestExecutor:
@@ -56,6 +23,8 @@ class DanaTestExecutor:
         self.config = config or {}
         self.timeout = self.config.get("timeout", 30.0)
         self.dana_command = self.config.get("dana_command", "dana")
+        self.use_json_output = self.config.get("use_json_output", False)
+        self.assertion_parser = DanaAssertionParser()
         logger.debug(f"Initialized executor with timeout: {self.timeout}s")
 
     def run_dana_file(self, file_path: Path) -> DanaTestResult:
@@ -76,7 +45,12 @@ class DanaTestExecutor:
             result = self._run_subprocess(file_path)
             duration = time.time() - start_time
 
-            success = result.returncode == 0
+            # Parse assertions from output
+            assertions = self.assertion_parser.parse_output(result.stdout, result.stderr)
+            
+            # Determine success based on exit code and assertions
+            has_failed_assertions = any(not a.passed for a in assertions if a.assertion_type == "assert")
+            success = result.returncode == 0 and not has_failed_assertions
 
             logger.debug(
                 f"Dana execution completed in {duration:.2f}s, exit code: {result.returncode}"
@@ -89,6 +63,7 @@ class DanaTestExecutor:
                 output=result.stdout,
                 errors=result.stderr,
                 exit_code=result.returncode,
+                assertions=assertions
             )
 
         except subprocess.TimeoutExpired:
@@ -127,7 +102,13 @@ class DanaTestExecutor:
 
     def _run_subprocess(self, file_path: Path) -> subprocess.CompletedProcess:
         """Run Dana file using subprocess"""
-        cmd = [self.dana_command, str(file_path)]
+        cmd = [self.dana_command]
+        
+        # Add JSON output flag if requested
+        if self.use_json_output:
+            cmd.append("--output-json")
+            
+        cmd.append(str(file_path))
 
         logger.debug(f"Running command: {' '.join(cmd)}")
 

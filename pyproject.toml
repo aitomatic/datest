@@ -51,6 +51,7 @@ dependencies = [
     # Configuration and utilities
     "python-dotenv>=1.0.0,<2.0.0",
     "pyyaml>=6.0.0,<7.0.0",
+    "tomli>=2.0.1;python_version<'3.11'",  # For Python < 3.11
     
     # CLI and output formatting
     "click>=8.1.0,<9.0.0",
@@ -232,7 +233,9 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
+    "dana: marks tests as Dana language tests",
 ]
+plugins = ["datest.pytest_plugin"]
 
 # =============================================================================
 # Coverage Configuration
