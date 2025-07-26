@@ -11,7 +11,7 @@
 .DEFAULT_GOAL := help
 
 # All targets are phony (don't create files)
-.PHONY: help help-more quickstart install setup-dev sync test clean clean-natest lint format fix check mypy \
+.PHONY: help help-more quickstart install setup-dev sync test clean clean-datest lint format fix check mypy \
 	install-llm docs-serve docs-build docs-deps test-fast test-cov dev security validate-config check-structure release-check \
 	sync-dev lock-deps check-uv build dist check-dist publish run datest-test
 
@@ -255,14 +255,14 @@ clean: ## Clean build artifacts and caches
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	rm -rf .ruff_cache/ .mypy_cache/
 
-clean-natest: ## Clean up natest directory (keeps datest)
-	@echo "🧹 Cleaning up natest directory..."
-	@if [ -d natest ]; then \
-		echo "📁 Removing natest directory..."; \
-		rm -rf natest/; \
-		echo "✅ natest directory removed"; \
+clean-datest: ## Clean up datest directory (keeps datest)
+	@echo "🧹 Cleaning up datest directory..."
+	@if [ -d datest ]; then \
+		echo "📁 Removing datest directory..."; \
+		rm -rf datest/; \
+		echo "✅ datest directory removed"; \
 	else \
-		echo "ℹ️  natest directory not found"; \
+		echo "ℹ️  datest directory not found"; \
 	fi
 
 docs-serve: ## Serve documentation locally
@@ -357,7 +357,7 @@ check-structure: ## MORE: Check project structure and setup
 		echo "  ❌ tests/fixtures/ - Missing!"; \
 	fi
 	@echo "📁 Legacy cleanup:"
-	@if [ -d natest ]; then echo "  ⚠️  natest/ - Legacy directory (run 'make clean-natest' to remove)"; else echo "  ✅ No legacy natest directory"; fi
+	@if [ -d datest ]; then echo "  ⚠️  datest/ - Legacy directory (run 'make clean-datest' to remove)"; else echo "  ✅ No legacy datest directory"; fi
 
 release-check: clean check test-fast security validate-config ## MORE: Complete pre-release validation
 	@echo ""

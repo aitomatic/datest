@@ -168,4 +168,6 @@ Some trailing text
 
         # Should parse JSON part
         assert len(assertions) >= 1
-        assert any(a.line_number == 10 for a in assertions)
+        # The JSON parsing should extract the line number from the JSON
+        json_assertions = [a for a in assertions if a.line_number == 10]
+        assert len(json_assertions) >= 1

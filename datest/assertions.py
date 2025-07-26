@@ -82,7 +82,19 @@ class DanaAssertionParser:
             if json_start == -1:
                 return None
 
-            json_str = output[json_start:]
+            # Find the end of the JSON object
+            brace_count = 0
+            json_end = json_start
+            for i, char in enumerate(output[json_start:], json_start):
+                if char == "{":
+                    brace_count += 1
+                elif char == "}":
+                    brace_count -= 1
+                    if brace_count == 0:
+                        json_end = i + 1
+                        break
+
+            json_str = output[json_start:json_end]
             data = json.loads(json_str)
 
             assertions = []

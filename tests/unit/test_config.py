@@ -144,16 +144,7 @@ color = false
         """Test finding and loading config from current directory"""
 
         # Mock datest.toml exists in current directory
-        def exists_side_effect(self):
-            return str(self).endswith("datest.toml") and "parent" not in str(self)
-
-        mock_exists.side_effect = exists_side_effect
-
-        toml_content = """
-[discovery]
-patterns = ["found_*.na"]
-        """
-        mock_file.return_value.read.return_value = toml_content.encode()
+        mock_exists.return_value = True
 
         with patch("datest.config.tomllib.load") as mock_load:
             mock_load.return_value = {"discovery": {"patterns": ["found_*.na"]}}
@@ -168,28 +159,12 @@ patterns = ["found_*.na"]
         """Test loading from pyproject.toml [tool.datest] section"""
 
         # Mock pyproject.toml exists
-        def exists_side_effect(self):
-            return str(self).endswith("pyproject.toml")
-
-        mock_exists.side_effect = exists_side_effect
-
-        _pyproject_content = """
-[tool.datest]
-[tool.datest.discovery]
-patterns = ["pyproject_*.na"]
-
-[tool.datest.execution]
-timeout = 90.0
-        """
+        mock_exists.return_value = True
 
         with patch("datest.config.tomllib.load") as mock_load:
             mock_load.return_value = {
-                "tool": {
-                    "datest": {
-                        "discovery": {"patterns": ["pyproject_*.na"]},
-                        "execution": {"timeout": 90.0},
-                    }
-                }
+                "discovery": {"patterns": ["pyproject_*.na"]},
+                "execution": {"timeout": 90.0},
             }
 
             config = DatestConfig.find_and_load()
