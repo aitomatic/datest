@@ -1,5 +1,5 @@
 // test_failing.na - Dana test file with intentional failures
-// This file tests natest's ability to handle failing tests
+// This file tests datest's ability to handle failing tests
 
 log("🧪 Starting failing Dana test")
 

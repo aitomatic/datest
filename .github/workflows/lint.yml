@@ -1,0 +1,45 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: pip-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          pip-${{ runner.os }}-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Critical checks (E722, F821)
+      run: ruff check datest/ tests/ --select=E722,F821
+    
+    - name: Important checks (F841, B017)
+      run: ruff check datest/ tests/ --select=F841,B017
+    
+    - name: Style checks
+      run: ruff check datest/ tests/ --select=E,F,W,UP
+    
+    - name: Run ruff format check
+      run: ruff format --check datest/ tests/ 

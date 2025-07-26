@@ -1,0 +1,423 @@
+# Datest MVP - 3D Design Document
+
+> **Design-Driven Development for Dana Testing Framework Integration**
+
+## 🎯 Project Overview
+
+**Goal**: Create a minimal viable Dana-native testing framework that integrates with existing Dana runtime and pytest infrastructure.
+
+**Scope**: Dana test organization, assertions, and reporting - NOT parsing or execution (Dana already provides this).
+
+**Timeline**: 3 phases, ~1 week MVP
+
+---
+
+## 📋 Requirements Analysis
+
+### **Core Requirements**
+1. **Discover Dana test files** (`test_*.na`) in directories
+2. **Execute tests using existing Dana runtime** (`dana.core.repl.dana`)
+3. **Provide Dana-specific assertions** (integrate with Dana language)
+4. **Report test results** with Dana context and debugging
+5. **Integrate with pytest** for unified test discovery
+
+### **Non-Requirements (YAGNI)**
+- ❌ Custom Dana parser (Dana already has this)
+- ❌ Custom execution engine (Dana runtime exists)
+- ❌ Complex configuration (start simple)
+- ❌ Parallel execution (not needed for MVP)
+- ❌ Coverage analysis (future enhancement)
+
+### **Integration Points**
+- **Existing Dana Runtime**: `dana.core.repl.dana` for `.na` file execution
+- **Existing pytest**: Already discovers `.na` files
+- **Dana Grammar**: `dana/core/lang/parser/dana_grammar.lark`
+- **Dana REPL**: For interactive testing and debugging
+
+---
+
+## 🏗️ Architecture Design
+
+### **KISS Architecture Principles**
+- **Build on existing Dana infrastructure** (don't reinvent)
+- **Single responsibility**: Test organization and reporting only
+- **Simple integration**: Bridge between pytest and Dana runtime
+- **Minimal dependencies**: Use what Dana already provides
+
+### **Component Design**
+
+```
+🧪 DATEST MVP ARCHITECTURE (Dana-Integrated)
+
+┌─────────────────────────────────────────────────────────┐
+│                 🖥️  CLI LAYER                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
+│  │    datest   │  │   pytest   │  │     Dana        │ │
+│  │   command   │  │ integration │  │   Commands      │ │
+│  └─────────────┘  └─────────────┘  └─────────────────┘ │
+└─────────────┬───────────────────────────────┬─────────┘
+              │                               │
+┌─────────────▼───────────────────────────────▼─────────┐
+│               🔍 TEST DISCOVERY                        │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
+│  │   .na File  │  │   Pattern   │  │     Dana        │ │
+│  │  Discovery  │  │   Matcher   │  │  Validator      │ │
+│  └─────────────┘  └─────────────┘  └─────────────────┘ │
+└─────────────┬───────────────────────────────┬─────────┘
+              │                               │
+┌─────────────▼───────────────────────────────▼─────────┐
+│             🧪 DANA EXECUTION BRIDGE                   │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
+│  │    Dana     │  │    Test     │  │     Result      │ │
+│  │   Runtime   │  │  Execution  │  │   Collector     │ │
+│  │  (existing) │  │   Bridge    │  │                 │ │
+│  └─────────────┘  └─────────────┘  └─────────────────┘ │
+└─────────────┬───────────────────────────────┬─────────┘
+              │                               │
+┌─────────────▼───────────────────────────────▼─────────┐
+│              📊 DANA TEST REPORTING                    │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
+│  │    Dana     │  │   Console   │  │     Exit        │ │
+│  │  Formatter  │  │   Output    │  │    Codes        │ │
+│  └─────────────┘  └─────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+### **Core Components**
+
+#### **1. Test Discovery** (`natest/discovery.py`)
+```python
+class DanaTestDiscovery:
+    """Find Dana test files using existing file patterns"""
+    def discover(self, paths: List[Path]) -> List[Path]:
+        # Use glob patterns for test_*.na files
+        # Validate files exist and are readable
+        # Return sorted list of test paths
+```
+
+#### **2. Dana Execution Bridge** (`natest/executor.py`)
+```python
+class DanaTestExecutor:
+    """Execute Dana tests using existing Dana runtime"""
+    def run_dana_file(self, file_path: Path) -> DanaTestResult:
+        # Use subprocess to call: dana --output-json file.na
+        # Or import dana.core.repl.dana directly
+        # Capture output, errors, and exit codes
+```
+
+#### **3. Test Result Collector** (`natest/results.py`)
+```python
+class DanaTestResult:
+    """Collect and format Dana test results"""
+    # Parse Dana execution output
+    # Extract test assertions and log statements
+    # Format for console display
+```
+
+#### **4. pytest Integration** (`natest/pytest_plugin.py`)
+```python
+def pytest_collect_file(path, parent):
+    """Register .na files with pytest discovery"""
+    if path.ext == ".na" and path.basename.startswith("test_"):
+        return DanaTestFile.from_parent(parent, fspath=path)
+```
+
+---
+
+## 🔧 Implementation Phases
+
+### **Phase 1: Foundation (2 days)**
+**Goal**: Basic Dana test discovery and execution
+
+#### **Implementation Tasks**
+- [ ] Create `datest/discovery.py` with basic `.na` file discovery
+- [ ] Create `datest/executor.py` that calls Dana runtime via subprocess
+- [ ] Create `datest/results.py` for basic result parsing
+- [ ] Update `datest/cli.py` to integrate components
+- [ ] Create basic test fixtures in `tests/fixtures/`
+
+#### **Acceptance Criteria**
+- [ ] `datest tests/fixtures/` discovers test files
+- [ ] `datest tests/fixtures/simple_test.na` executes Dana file
+- [ ] Basic pass/fail status reported to console
+- [ ] No crashes on valid `.na` files
+
+#### **Test Strategy**
+```bash
+# Phase 1 Testing
+dana tests/fixtures/simple_test.na    # Manual verification
+datest tests/fixtures/               # Automated discovery
+uv run pytest tests/unit/test_discovery.py -v
+```
+
+### **Phase 2: Dana Integration (2 days)**
+**Goal**: Proper Dana runtime integration and assertions
+
+#### **Implementation Tasks**
+- [ ] Improve Dana runtime integration (direct import vs subprocess)
+- [ ] Add Dana-specific assertion parsing from output
+- [ ] Create `datest/assertions.py` for Dana test patterns
+- [ ] Add structured result parsing (JSON output from Dana)
+- [ ] Enhance error handling and debugging
+
+#### **Acceptance Criteria**
+- [ ] Dana `log()` statements captured and formatted
+- [ ] Dana `assert` statements detected and reported
+- [ ] Proper error messages for Dana syntax errors
+- [ ] Test timing and execution context preserved
+
+#### **Test Strategy**
+```bash
+# Phase 2 Testing
+datest --verbose tests/fixtures/      # Enhanced output
+dana --debug tests/fixtures/simple_test.na  # Verify Dana execution
+uv run pytest tests/integration/ -v   # End-to-end tests
+```
+
+### **Phase 3: Polish & Integration (1 day)**
+**Goal**: pytest integration and production readiness
+
+#### **Implementation Tasks**
+- [ ] Create `datest/pytest_plugin.py` for pytest integration
+- [ ] Add rich console output with colors and formatting
+- [ ] Implement proper exit codes (0=pass, 1=fail, 2=error)
+- [ ] Add configuration support (`datest.toml`)
+- [ ] Final testing and documentation
+
+#### **Acceptance Criteria**
+- [ ] `pytest tests/` discovers and runs `.na` files automatically
+- [ ] Rich console output with ✅❌ status indicators
+- [ ] Proper exit codes for CI/CD integration
+- [ ] Configuration file support for test patterns
+
+#### **Test Strategy**
+```bash
+# Phase 3 Testing
+pytest tests/ -v                     # Full integration test
+datest --help                        # CLI documentation
+uv run pytest tests/ --verbose       # Complete test suite
+```
+
+---
+
+## 📊 Data Models (Simple)
+
+### **Core Data Structures**
+```python
+# datest/models.py
+
+@dataclass
+class DanaTestFile:
+    """Represents a Dana test file"""
+    path: Path
+    name: str
+    
+@dataclass  
+class DanaTestResult:
+    """Result of running a Dana test file"""
+    file_path: Path
+    success: bool
+    duration: float
+    output: str
+    errors: List[str]
+    assertions: List[DanaAssertion]
+
+@dataclass
+class DanaAssertion:
+    """Dana assertion result"""
+    line_number: int
+    assertion_type: str  # "assert", "log", etc.
+    message: str
+    passed: bool
+```
+
+---
+
+## 🔄 Integration Strategy
+
+### **Dana Runtime Integration**
+```python
+# datest/executor.py
+
+class DanaTestExecutor:
+    def run_dana_file(self, file_path: Path) -> DanaTestResult:
+        """Execute Dana test file using existing runtime"""
+        
+        # Option 1: Subprocess (simple, isolated)
+        result = subprocess.run([
+            "dana", "--output-json", str(file_path)
+        ], capture_output=True, text=True)
+        
+        # Option 2: Direct import (faster, more integrated)
+        # from dana.core.repl.dana import execute_file
+        # result = execute_file(file_path)
+        
+        return self._parse_dana_output(result.stdout, result.stderr)
+```
+
+### **pytest Integration**
+```python
+# datest/pytest_plugin.py
+
+def pytest_collect_file(path, parent):
+    """Register .na files with pytest"""
+    if path.suffix == ".na" and "test_" in path.name:
+        return DanaTestFile.from_parent(parent, path=path)
+
+class DanaTestFile(pytest.File):
+    def collect(self):
+        # Return DanaTestItem for each test in the file
+        yield DanaTestItem.from_parent(self, name=self.path.name)
+```
+
+---
+
+## 🧪 Testing Strategy
+
+### **Self-Testing Approach**
+- **Unit Tests**: Test datest components in isolation (`tests/unit/`)
+- **Integration Tests**: Test Dana runtime integration (`tests/integration/`)
+- **Fixture Tests**: Known Dana test files with expected results (`tests/fixtures/`)
+- **End-to-End Tests**: Full datest execution pipeline (`tests/e2e/`)
+
+### **Test Files Structure**
+```
+tests/
+├── unit/                    # Unit tests for datest components
+│   ├── test_discovery.py    # Test file discovery
+│   ├── test_executor.py     # Test Dana execution bridge  
+│   └── test_results.py      # Test result parsing
+├── integration/             # Integration with Dana runtime
+│   └── test_dana_integration.py
+├── fixtures/                # Dana test files for testing
+│   ├── simple_test.na       # Basic Dana test
+│   ├── failing_test.na      # Test with failures
+│   └── error_test.na        # Test with errors
+└── e2e/                     # End-to-end testing
+    └── test_full_pipeline.py
+```
+
+### **Validation Commands**
+```bash
+# Continuous validation during development
+uv run ruff check . && uv run ruff format .  # Code quality
+uv run pytest tests/ -v                      # All tests
+dana tests/fixtures/simple_test.na           # Manual Dana execution
+datest tests/fixtures/                       # Manual datest execution
+```
+
+---
+
+## 📈 Success Metrics
+
+### **MVP Success Criteria**
+1. **Discovery**: Find all `test_*.na` files in specified directories
+2. **Execution**: Successfully execute Dana tests using existing runtime
+3. **Reporting**: Clear pass/fail output with test names and timing
+4. **Integration**: Work with existing pytest infrastructure
+5. **Reliability**: Handle Dana errors gracefully with useful messages
+
+### **Performance Targets**
+- **Startup**: < 200ms for basic commands
+- **Discovery**: Process 100 files in < 1 second
+- **Execution**: Run 20 simple Dana tests in < 5 seconds
+- **Memory**: < 20MB overhead (leverage Dana runtime)
+
+---
+
+## 🔮 Future Enhancements (Post-MVP)
+
+### **Phase 4+: Advanced Features**
+- **Dana-specific assertions**: `expect_reasoning()`, `assert_memory()`
+- **Test parameterization**: Dana test data injection
+- **Coverage reporting**: Dana code coverage analysis
+- **Parallel execution**: Run multiple Dana tests concurrently
+- **IDE integration**: VS Code extension for Dana test support
+
+### **Integration Opportunities**
+- **CI/CD**: GitHub Actions integration for Dana projects
+- **Dana Agent Testing**: Specialized assertions for agent behavior
+- **Dana Module Testing**: Test Dana module imports and exports
+- **Performance Testing**: Dana execution benchmarking
+
+---
+
+## 🎯 Implementation Checkboxes
+
+### **Phase 1: Foundation** ✅ **COMPLETE**
+- [x] Basic file discovery implementation
+- [x] Dana runtime subprocess integration
+- [x] Simple result parsing and reporting
+- [x] Basic CLI command structure
+- [x] Initial test fixtures and validation
+
+**Phase 1 Results:**
+- ✅ Discovery working: Finds all Dana test files correctly (`test_*.na`, `*_test.na`)
+- ✅ CLI integration: Rich console output, verbose mode, discovery-only mode
+- ✅ Error handling: Graceful fallback when Dana command unavailable
+- ✅ Test fixtures: Created `simple_test.na`, `failing_test.na`, `error_test.na`
+- ✅ Unit tests: Comprehensive test coverage for discovery component
+- ✅ Exit codes: Proper exit codes (0=success, 1=test failure, 2=error)
+
+**Phase 1 Validation:**
+```bash
+uv run datest --discover-only tests/fixtures/  # ✅ Discovers 3 files
+uv run datest -v tests/fixtures/               # ✅ Graceful Dana fallback
+uv run pytest tests/unit/test_discovery.py -v  # ✅ 12/13 tests pass
+```
+
+### **Phase 2: Dana Integration** ✅ **COMPLETE**
+- [x] Enhanced Dana runtime integration
+- [x] Dana assertion and log parsing
+- [x] Structured result handling
+- [x] Error handling and debugging
+- [x] Rich output formatting
+
+**Phase 2 Results:**
+- ✅ Created models.py with DanaTestFile, DanaAssertion, DanaTestResult dataclasses
+- ✅ Created assertions.py with DanaAssertionParser for parsing Dana output
+- ✅ Enhanced executor.py to use new models and assertion parser
+- ✅ Updated reporter.py to display parsed assertions and enhanced output
+- ✅ Added JSON output support (--output-json flag)
+- ✅ Created comprehensive unit tests for models, assertions, and executor
+- ✅ Created integration tests for full pipeline testing
+- ✅ Improved error handling with proper exit codes
+
+### **Phase 3: Polish & Integration** ✅ **COMPLETE**
+- [x] pytest plugin implementation
+- [x] Rich console output with colors
+- [x] Configuration file support
+- [x] Proper exit codes and error handling
+- [x] Final testing and documentation
+
+**Phase 3 Results:**
+- ✅ Created pytest_plugin.py with full pytest integration
+- ✅ Added pytest hooks for .na file discovery and execution
+- ✅ Created config.py with DatestConfig for configuration management
+- ✅ Support for datest.toml and pyproject.toml configuration files
+- ✅ Enhanced CLI with configuration support and new options
+- ✅ Added proper exit codes (0=success, 1=test failure, 2=error)
+- ✅ Created comprehensive unit tests for configuration
+- ✅ Created end-to-end tests for full pipeline testing
+- ✅ Updated pyproject.toml with pytest plugin registration
+
+---
+
+## 📝 Implementation Notes
+
+### **Key Design Decisions**
+1. **Leverage existing Dana infrastructure** instead of rebuilding
+2. **Start with subprocess** for Dana execution (simple, reliable)
+3. **Focus on test organization** rather than language parsing
+4. **Integrate with pytest** for unified testing experience
+5. **KISS principle**: Minimal viable functionality first
+
+### **Risk Mitigation**
+- **Dana runtime dependency**: Test with existing Dana commands first
+- **Output parsing**: Start with simple text parsing, enhance incrementally
+- **pytest integration**: Build standalone first, add pytest plugin later
+- **Performance**: Profile with realistic test suites, optimize if needed
+
+---
+
+*This design follows 3D methodology: comprehensive design before implementation, clear phases with validation, and focus on integration with existing Dana ecosystem.* 

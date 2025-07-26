@@ -1,4 +1,4 @@
-# .gitignore - Natest Git Ignore Rules
+# .gitignore - Datest Git Ignore Rules
 # Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 
 # Python
@@ -62,6 +62,7 @@ node_modules/
 .cache/
 .ipynb_checkpoints/
 .cursor/
+CLAUDE.md
 
 .vscode/launch.json
 .vscode/settings.json

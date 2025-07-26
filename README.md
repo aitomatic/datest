@@ -1,4 +1,4 @@
-# Natest 🧪
+# Datest 🧪
 
 > **Simple testing framework for Dana language files (.na)**
 
@@ -6,7 +6,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
-Natest is a minimal testing framework for Dana (.na) files. It provides basic test discovery and execution for neurosymbolic agent systems written in the Dana language.
+Datest is a minimal testing framework for Dana (.na) files. It provides basic test discovery and execution for neurosymbolic agent systems written in the Dana language.
 
 **Status: Early MVP** - Basic functionality for discovering and validating Dana test files.
 
@@ -16,23 +16,23 @@ Natest is a minimal testing framework for Dana (.na) files. It provides basic te
 
 ```bash
 # Install and setup
-git clone https://github.com/aitomatic/natest.git
-cd natest
+git clone https://github.com/aitomatic/datest.git
+cd datest
 make quickstart
 
-# Run natest (currently shows help and validates setup)
-natest
+# Run datest (currently shows help and validates setup)
+datest
 
 # Future: Basic Dana file testing
-natest test_example.na           # Run a Dana test file
-natest tests/                    # Run all .na files in directory
+datest test_example.na           # Run a Dana test file
+datest tests/                    # Run all .na files in directory
 ```
 
 ---
 
-## 🧪 What Natest Does
+## 🧪 What Datest Does
 
-Natest is a **barebones MVP** that focuses on the essentials:
+Datest is a **barebones MVP** that focuses on the essentials:
 
 ### **Basic Test Discovery**
 - Finds `.na` files in directories
@@ -76,8 +76,8 @@ test "basic memory" {
 
 ```bash
 # Quick setup
-git clone https://github.com/aitomatic/natest.git
-cd natest
+git clone https://github.com/aitomatic/datest.git
+cd datest
 make setup-dev
 ```
 
@@ -93,21 +93,21 @@ pip install -e .
 ### **Current Commands**
 ```bash
 # Show help and validate installation
-natest
+datest
 
 # Check version
-natest --version
+datest --version
 
 # Verbose output
-natest --verbose
+datest --verbose
 ```
 
 ### **Planned Commands (Simple)**
 ```bash
 # Run Dana test files
-natest test_example.na           # Single file
-natest tests/                    # Directory of .na files
-natest --list                    # Show discovered tests
+datest test_example.na           # Single file
+datest tests/                    # Directory of .na files
+datest --list                    # Show discovered tests
 ```
 
 ---
@@ -162,10 +162,10 @@ test "memory recall" {
 
 ## 🔧 Configuration (Minimal)
 
-### **Basic natest.toml**
+### **Basic datest.toml**
 ```toml
-# natest.toml - Simple configuration
-[tool.natest]
+# datest.toml - Simple configuration
+[tool.datest]
 test_dirs = ["tests"]
 test_pattern = "test_*.na"
 ```
@@ -192,8 +192,8 @@ This is a minimal MVP, so contributions should focus on:
 
 ### **Getting Started**
 ```bash
-git clone https://github.com/your-username/natest.git
-cd natest
+git clone https://github.com/your-username/datest.git
+cd datest
 make setup-dev
 make test
 ```
@@ -221,9 +221,9 @@ make test
 
 ## 🔗 Resources
 
-- **Repository**: [github.com/aitomatic/natest](https://github.com/aitomatic/natest)
-- **Issues**: [Report bugs and simple feature requests](https://github.com/aitomatic/natest/issues)
-- **Discussions**: [Basic usage questions](https://github.com/aitomatic/natest/discussions)
+- **Repository**: [github.com/aitomatic/datest](https://github.com/aitomatic/datest)
+- **Issues**: [Report bugs and simple feature requests](https://github.com/aitomatic/datest/issues)
+- **Discussions**: [Basic usage questions](https://github.com/aitomatic/datest/discussions)
 
 ---
 

@@ -5,7 +5,7 @@ Unit tests for Dana test discovery functionality.
 from pathlib import Path
 from unittest.mock import patch
 
-from natest.discovery import DanaTestDiscovery, DiscoveryConfig
+from datest.discovery import DanaTestDiscovery, DiscoveryConfig
 
 
 class TestDiscoveryConfig:

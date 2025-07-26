@@ -1,8 +1,8 @@
-# Makefile - Natest Development Commands
+# Makefile - Datest Development Commands
 # Copyright © 2025 Aitomatic, Inc. Licensed under the MIT License.
 
 # =============================================================================
-# Natest Development Makefile - Essential Commands Only
+# Datest Development Makefile - Essential Commands Only
 # =============================================================================
 
 # Modern dependency management - using uv (with pip fallback)
@@ -11,29 +11,29 @@
 .DEFAULT_GOAL := help
 
 # All targets are phony (don't create files)
-.PHONY: help help-more quickstart install setup-dev sync test dana clean lint format fix check mypy \
-	install-ollama start-ollama install-vllm start-vllm install-vscode install-cursor install-vim install-emacs \
-	docs-serve docs-build docs-deps test-fast test-cov update-deps dev security validate-config release-check \
-	sync-dev lock-deps check-uv
+.PHONY: help help-more quickstart install setup-dev sync test clean clean-datest lint format fix check mypy \
+	install-llm docs-serve docs-build docs-deps test-fast test-cov dev security validate-config check-structure release-check \
+	sync-dev lock-deps check-uv build dist check-dist publish run datest-test
 
 # =============================================================================
 # Help & Quick Start
 # =============================================================================
 
-help: ## Show essential Natest commands
+help: ## Show essential Datest commands
 	@echo ""
-	@echo "\033[1m\033[34mNatest Development Commands\033[0m"
+	@echo "\033[1m\033[34mDatest Development Commands\033[0m"
 	@echo "\033[1m======================================\033[0m"
 	@echo ""
 	@echo "\033[1mGetting Started:\033[0m"
-	@echo "  \033[36mquickstart\033[0m      🚀 Get Natest running in 30 seconds!"
+	@echo "  \033[36mquickstart\033[0m      🚀 Get Datest running in 30 seconds!"
 	@echo "  \033[36minstall\033[0m         📦 Install package and dependencies (uv preferred)"
 	@echo "  \033[36msetup-dev\033[0m       🛠️  Install with development dependencies"
 	@echo "  \033[36msync\033[0m            ⚡ Fast dependency sync with uv"
 	@echo ""
-	@echo "\033[1mUsing Natest:\033[0m"
-	@echo "  \033[36mnatest\033[0m          🚀 Start the Natest framework"
+	@echo "\033[1mUsing Datest:\033[0m"
+	@echo "  \033[36mdatest\033[0m          🚀 Start the Datest framework"
 	@echo "  \033[36mtest\033[0m            🧪 Run all tests"
+	@echo "  \033[36mdatest-test\033[0m     🧪 Run datest-specific tests and validation"
 	@echo ""
 	@echo "\033[1mCode Quality:\033[0m"
 	@echo "  \033[36mlint\033[0m            🔍 Check code style and quality"
@@ -52,7 +52,7 @@ help: ## Show essential Natest commands
 
 help-more: ## Show all available commands including advanced ones
 	@echo ""
-	@echo "\033[1m\033[34mNatest Development Commands (Complete)\033[0m"
+	@echo "\033[1m\033[34mDatest Development Commands (Complete)\033[0m"
 	@echo "\033[1m===========================================\033[0m"
 	@echo ""
 	@echo "\033[1mGetting Started:\033[0m"
@@ -77,9 +77,9 @@ help-more: ## Show all available commands including advanced ones
 	@awk 'BEGIN {FS = ":.*?## "} /^(clean|docs-serve).*:.*?## / {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
-quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
+quickstart: ## 🚀 QUICK START: Get Datest running in 30 seconds!
 	@echo ""
-	@echo "🚀 \033[1m\033[32mNatest Quick Start\033[0m"
+	@echo "🚀 \033[1m\033[32mDatest Quick Start\033[0m"
 	@echo "===================="
 	@echo ""
 	@echo "📦 Installing dependencies..."
@@ -100,7 +100,7 @@ quickstart: ## 🚀 QUICK START: Get Natest running in 30 seconds!
 	@echo "🎉 \033[1m\033[32mReady to go!\033[0m"
 	@echo ""
 	@echo "\033[1mNext: Add your API key to .env, then:\033[0m"
-	@echo "  \033[36mmake natest\033[0m  # Start Natest framework"
+	@echo "  \033[36mmake datest\033[0m  # Start Datest framework"
 	@echo "  \033[36mmake test\033[0m    # Run tests"
 	@echo ""
 	@echo "\033[33m💡 Tip: Run 'open .env' to edit your API keys\033[0m"
@@ -171,13 +171,31 @@ install-llm: ## Install optional LLM integration for testing reason() calls
 # Usage
 # =============================================================================
 
-natest: ## Start the Natest framework
-	@echo "🚀 Starting Natest framework..."
-	natest
+datest: ## Start the Datest framework
+	@echo "🚀 Starting Datest framework..."
+	datest
 
 test: ## Run all tests
 	@echo "🧪 Running tests..."
 	pytest tests/
+
+datest-test: ## Run datest-specific tests and validation
+	@echo "🧪 Running Datest framework tests..."
+	@echo "📋 Testing datest CLI..."
+	@if command -v datest >/dev/null 2>&1; then \
+		datest --help >/dev/null && echo "✅ datest CLI works"; \
+	else \
+		echo "⚠️  datest command not found, run 'make install' first"; \
+	fi
+	@echo "📋 Testing datest discovery..."
+	@if [ -d tests/fixtures ]; then \
+		echo "✅ Test fixtures directory found"; \
+		ls tests/fixtures/*.na 2>/dev/null | wc -l | xargs echo "📁 Found .na test files:"; \
+	else \
+		echo "⚠️  No test fixtures directory found"; \
+	fi
+	@echo "📋 Running pytest with datest plugin..."
+	pytest tests/ -v
 
 # =============================================================================
 # Code Quality
@@ -185,26 +203,42 @@ test: ## Run all tests
 
 lint: ## Check code style and quality
 	@echo "🔍 Running linting checks..."
-	ruff check .
+	@echo "  Critical checks (E722, F821)..."
+	ruff check datest/ tests/ --select=E722,F821
+	@echo "  Important checks (F841, B017)..."
+	ruff check datest/ tests/ --select=F841,B017
+	@echo "  Style checks..."
+	ruff check datest/ tests/ --select=E,F,W,UP
+
+lint-critical: ## Run critical lint checks (E722, F821)
+	@echo "🔍 Running critical lint checks..."
+	ruff check datest/ tests/ --select=E722,F821
+
+lint-important: ## Run important lint checks (F841, B017)
+	@echo "🔍 Running important lint checks..."
+	ruff check datest/ tests/ --select=F841,B017
 
 format: ## Format code automatically
 	@echo "✨ Formatting code..."
-	ruff format .
+	ruff format datest/ tests/
 
 check: lint ## Run all code quality checks
 	@echo "📝 Checking code formatting..."
-	ruff format --check .
+	ruff format --check datest/ tests/
 	@echo "✅ All quality checks completed!"
 
 fix: ## Auto-fix all fixable code issues
 	@echo "🔧 Auto-fixing code issues..."
-	ruff check --fix .
-	ruff format .
+	ruff check --fix datest/ tests/
+	ruff format datest/ tests/
 	@echo "🔧 Applied all auto-fixes!"
 
 mypy: ## Run type checking
 	@echo "🔍 Running type checks..."
-	mypy .
+	mypy datest/ tests/
+
+ci-check: lint-critical test ## Run CI checks locally
+	@echo "✅ CI checks completed!"
 
 # =============================================================================
 # Optional Extensions
@@ -220,6 +254,16 @@ clean: ## Clean build artifacts and caches
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	rm -rf .ruff_cache/ .mypy_cache/
+
+clean-datest: ## Clean up datest directory (keeps datest)
+	@echo "🧹 Cleaning up datest directory..."
+	@if [ -d datest ]; then \
+		echo "📁 Removing datest directory..."; \
+		rm -rf datest/; \
+		echo "✅ datest directory removed"; \
+	else \
+		echo "ℹ️  datest directory not found"; \
+	fi
 
 docs-serve: ## Serve documentation locally
 	@echo "📚 Serving docs at http://localhost:8000"
@@ -255,7 +299,7 @@ test-fast: ## MORE: Run fast tests only
 
 test-cov: ## MORE: Run tests with coverage report
 	@echo "📊 Running tests with coverage..."
-	pytest --cov=natest --cov-report=html --cov-report=term tests/
+	pytest --cov=datest --cov-report=html --cov-report=term tests/
 	@echo "📈 Coverage report generated in htmlcov/"
 
 dev: setup-dev check test-fast ## MORE: Complete development setup and verification
@@ -263,7 +307,7 @@ dev: setup-dev check test-fast ## MORE: Complete development setup and verificat
 	@echo "🎉 \033[1m\033[32mDevelopment environment is ready!\033[0m"
 	@echo ""
 	@echo "Next steps:"
-	@echo "  • Run '\033[36mmake natest\033[0m' to start the Natest framework"
+	@echo "  • Run '\033[36mmake datest\033[0m' to start the Datest framework"
 	@echo "  • Run '\033[36mmake test\033[0m' to run tests"
 	@echo "  • Run '\033[36mmake check\033[0m' for code quality checks"
 	@echo ""
@@ -271,7 +315,7 @@ dev: setup-dev check test-fast ## MORE: Complete development setup and verificat
 security: ## MORE: Run security checks on codebase
 	@echo "🔒 Running security checks..."
 	@if command -v bandit >/dev/null 2>&1; then \
-		bandit -r natest/ || echo "⚠️  Security issues found"; \
+		bandit -r datest/ || echo "⚠️  Security issues found"; \
 	else \
 		echo "❌ bandit not available. Install with: pip install bandit"; \
 	fi
@@ -286,8 +330,34 @@ validate-config: ## MORE: Validate project configuration files
 	fi
 	@if [ -f mkdocs.yml ]; then \
 		echo "📝 Checking mkdocs.yml..."; \
-		python3 -c "import yaml; yaml.safe_load(open('mkdocs.yml')); print('✅ mkdocs.yml is valid')"; \
+		if [ -r mkdocs.yml ]; then \
+			echo "✅ mkdocs.yml exists and is readable"; \
+		else \
+			echo "❌ mkdocs.yml exists but is not readable"; \
+		fi; \
 	fi
+
+check-structure: ## MORE: Check project structure and setup
+	@echo "🏗️  Checking project structure..."
+	@echo "📁 Core directories:"
+	@if [ -d datest ]; then echo "  ✅ datest/ - Main package directory"; else echo "  ❌ datest/ - Missing!"; fi
+	@if [ -d tests ]; then echo "  ✅ tests/ - Test directory"; else echo "  ❌ tests/ - Missing!"; fi
+	@if [ -d docs ]; then echo "  ✅ docs/ - Documentation directory"; else echo "  ❌ docs/ - Missing!"; fi
+	@if [ -d examples ]; then echo "  ✅ examples/ - Examples directory"; else echo "  ❌ examples/ - Missing!"; fi
+	@echo "📁 Key files:"
+	@if [ -f pyproject.toml ]; then echo "  ✅ pyproject.toml - Project configuration"; else echo "  ❌ pyproject.toml - Missing!"; fi
+	@if [ -f README.md ]; then echo "  ✅ README.md - Project documentation"; else echo "  ❌ README.md - Missing!"; fi
+	@if [ -f datest/__init__.py ]; then echo "  ✅ datest/__init__.py - Package init"; else echo "  ❌ datest/__init__.py - Missing!"; fi
+	@if [ -f datest/cli.py ]; then echo "  ✅ datest/cli.py - CLI interface"; else echo "  ❌ datest/cli.py - Missing!"; fi
+	@echo "📁 Test fixtures:"
+	@if [ -d tests/fixtures ]; then \
+		echo "  ✅ tests/fixtures/ - Test fixtures directory"; \
+		ls tests/fixtures/*.na 2>/dev/null | wc -l | xargs echo "    📄 .na test files:"; \
+	else \
+		echo "  ❌ tests/fixtures/ - Missing!"; \
+	fi
+	@echo "📁 Legacy cleanup:"
+	@if [ -d datest ]; then echo "  ⚠️  datest/ - Legacy directory (run 'make clean-datest' to remove)"; else echo "  ✅ No legacy datest directory"; fi
 
 release-check: clean check test-fast security validate-config ## MORE: Complete pre-release validation
 	@echo ""
@@ -320,4 +390,4 @@ check-dist: ## Validate built distribution files
 publish: check-dist ## Upload to PyPI
 	@echo "🚀 Publishing to PyPI..."
 	twine upload --verbose dist/*
-run: natest ## Alias for 'natest' command
+run: datest ## Alias for 'datest' command

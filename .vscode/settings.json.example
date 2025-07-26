@@ -1,0 +1,44 @@
+{
+    "makefile.configureOnOpen": false,
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.pylint": false,
+    "python.linting.flake8": false,
+    "python.linting.mypy": false,
+    "python.linting.lintOnSave": true,
+    "python.linting.ruffArgs": ["--select=E722,F821,F841,B017", "--exclude=*.na"],
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUndefinedVariable": "warning",
+        "reportMissingImports": "warning",
+        "reportGeneralTypeIssues": "warning"
+    },
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/.mypy_cache": true,
+        "**/.venv": true,
+        "**/.env": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/.idea": true,
+        "**/.vscode": false,
+        "**/*.egg-info": true,
+        "bin/": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.cursor": true,
+        "**/.cursor.example": true,
+        "**/.precommit": true,
+        "**/.pre-commit-config.yaml": true,
+        "**/.pre-commit-hooks.yaml": true
+    }
+}
